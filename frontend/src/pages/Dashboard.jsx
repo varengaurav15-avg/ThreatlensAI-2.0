@@ -36,6 +36,7 @@ const NAV = [
   { id:"incidents", label:"Incidents",      icon:"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
   { id:"brief",     label:"AI Brief",       icon:"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
   { id:"sources",   label:"Data Sources",   icon:"M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" },
+  { id:"settings",  label:"Settings",       icon:"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
 ];
 
 const NODES = [
@@ -103,6 +104,174 @@ function PulseDot({ color="#22c55e", size=8 }) {
 }
 
 // ── MAIN DASHBOARD ───────────────────────────────────────────
+
+// ── SETTINGS PANEL ───────────────────────────────────────────
+function SettingsPanel() {
+  const [cfg, setCfg]       = useState(null);
+  const [saved, setSaved]   = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("monitoring");
+
+  useEffect(() => {
+    api.getConfig().then(r => setCfg(r.data)).catch(() => setCfg({
+      process:true, network:true, filesystem:true, logs:true,
+      responseMode:"conservative", aiEnabled:false, apiKey:"",
+      startOnBoot:false,
+      notifications:{desktop:true, tray:true, sound:false},
+      folders:["Documents","Desktop","Downloads"], exclusions:[],
+    }));
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig(cfg);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch(e) {
+      alert("Could not save — backend not reachable.");
+    }
+    setSaving(false);
+  };
+
+  if (!cfg) return (
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh",color:"#334155",fontSize:13}}>
+      Loading settings…
+    </div>
+  );
+
+  const toggle = (key, sub) => {
+    if (sub) {
+      setCfg(c => ({...c, [key]: {...c[key], [sub]: !c[key][sub]}}));
+    } else {
+      setCfg(c => ({...c, [key]: !c[key]}));
+    }
+  };
+
+  const STABS = [
+    {id:"monitoring", label:"Monitoring"},
+    {id:"response",   label:"Auto-Response"},
+    {id:"ai",         label:"AI & API Keys"},
+    {id:"notifs",     label:"Notifications"},
+  ];
+
+  const Row = ({label, desc, on, onToggle}) => (
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0",borderBottom:"1px solid #0f1e2e"}}>
+      <div>
+        <div style={{fontSize:13,color:"#e2e8f0",fontWeight:500}}>{label}</div>
+        {desc && <div style={{fontSize:11,color:"#334155",marginTop:3}}>{desc}</div>}
+      </div>
+      <button onClick={onToggle} style={{
+        width:42, height:24, borderRadius:12, border:"none", cursor:"pointer",
+        background: on ? "linear-gradient(90deg,#2563eb,#3b82f6)" : "#0f1e2e",
+        position:"relative", transition:"background 0.2s", flexShrink:0,
+      }}>
+        <div style={{
+          position:"absolute", top:3, left: on?20:3, width:18, height:18,
+          borderRadius:"50%", background:"#fff", transition:"left 0.2s",
+        }}/>
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="fade-up" style={{padding:28, maxWidth:720}}>
+      <div style={{marginBottom:24}}>
+        <div style={{fontSize:20,fontWeight:700,color:"#e2e8f0"}}>Settings</div>
+        <div style={{fontSize:12,color:"#334155",marginTop:4}}>Configure ThreatLens AI monitoring and behaviour</div>
+      </div>
+
+      {/* Sub-tabs */}
+      <div style={{display:"flex",gap:4,marginBottom:24,background:"#07101a",borderRadius:10,padding:4}}>
+        {STABS.map(t => (
+          <button key={t.id} onClick={()=>setActiveTab(t.id)} style={{
+            flex:1, padding:"8px 0", borderRadius:8, border:"none", cursor:"pointer",
+            background: activeTab===t.id ? "#0f1e2e" : "transparent",
+            color: activeTab===t.id ? "#93c5fd" : "#475569",
+            fontSize:12, fontWeight: activeTab===t.id ? 600 : 400, fontFamily:"inherit",
+            transition:"all 0.15s",
+          }}>{t.label}</button>
+        ))}
+      </div>
+
+      <div style={{background:"#07101a",border:"1px solid #0f1e2e",borderRadius:14,padding:"4px 20px 8px"}}>
+
+        {activeTab==="monitoring" && <>
+          <Row label="Process Monitoring"  desc="Track running processes and child spawns"           on={cfg.process}    onToggle={()=>toggle("process")}/>
+          <Row label="Network Monitoring"  desc="Monitor outbound connections and DNS queries"       on={cfg.network}    onToggle={()=>toggle("network")}/>
+          <Row label="Filesystem Watching" desc="Alert on changes in protected folders"              on={cfg.filesystem} onToggle={()=>toggle("filesystem")}/>
+          <Row label="Log Analysis"        desc="Parse Windows Event Logs for suspicious entries"    on={cfg.logs}       onToggle={()=>toggle("logs")}/>
+        </>}
+
+        {activeTab==="response" && <>
+          <div style={{padding:"14px 0",borderBottom:"1px solid #0f1e2e"}}>
+            <div style={{fontSize:13,color:"#e2e8f0",fontWeight:500,marginBottom:10}}>Response Mode</div>
+            {["conservative","moderate","aggressive"].map(mode => (
+              <label key={mode} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,cursor:"pointer"}}>
+                <input type="radio" name="responseMode" checked={cfg.responseMode===mode}
+                  onChange={()=>setCfg(c=>({...c,responseMode:mode}))}
+                  style={{accentColor:"#3b82f6"}}/>
+                <div>
+                  <span style={{fontSize:13,color:"#e2e8f0",textTransform:"capitalize"}}>{mode}</span>
+                  <span style={{fontSize:11,color:"#334155",marginLeft:8}}>
+                    {mode==="conservative" && "— Alert only, no automatic actions"}
+                    {mode==="moderate"     && "— Block network for high-severity threats"}
+                    {mode==="aggressive"   && "— Auto-isolate machines on CRITICAL incidents"}
+                  </span>
+                </div>
+              </label>
+            ))}
+          </div>
+          <Row label="Start on Boot" desc="Launch ThreatLens AI with Windows" on={cfg.startOnBoot} onToggle={()=>toggle("startOnBoot")}/>
+        </>}
+
+        {activeTab==="ai" && <>
+          <div style={{padding:"16px 0",borderBottom:"1px solid #0f1e2e"}}>
+            <Row label="Enable AI Features" desc="Use GPT-4o to summarise threats and generate daily briefs" on={cfg.aiEnabled} onToggle={()=>toggle("aiEnabled")}/>
+          </div>
+          <div style={{padding:"16px 0"}}>
+            <div style={{fontSize:13,color:"#e2e8f0",fontWeight:500,marginBottom:6}}>OpenAI API Key</div>
+            <div style={{fontSize:11,color:"#334155",marginBottom:10}}>Required for AI summaries and daily briefs. Get yours at platform.openai.com</div>
+            <input
+              type="password"
+              value={cfg.apiKey||""}
+              onChange={e=>setCfg(c=>({...c,apiKey:e.target.value}))}
+              placeholder="sk-..."
+              style={{
+                width:"100%", padding:"10px 14px", background:"#040c16",
+                border:"1px solid #1e3352", borderRadius:8, color:"#e2e8f0",
+                fontSize:13, fontFamily:"monospace",
+              }}
+            />
+          </div>
+        </>}
+
+        {activeTab==="notifs" && <>
+          <Row label="Desktop Notifications" desc="Show Windows toast notifications for incidents"     on={cfg.notifications?.desktop} onToggle={()=>toggle("notifications","desktop")}/>
+          <Row label="Tray Alerts"           desc="Show alerts in the system tray"                    on={cfg.notifications?.tray}    onToggle={()=>toggle("notifications","tray")}/>
+          <Row label="Sound Alerts"          desc="Play a sound on CRITICAL incidents"                on={cfg.notifications?.sound}   onToggle={()=>toggle("notifications","sound")}/>
+        </>}
+
+      </div>
+
+      <div style={{display:"flex",gap:10,marginTop:20}}>
+        <button onClick={save} disabled={saving} style={{
+          background:"linear-gradient(135deg,#2563eb,#1d4ed8)",
+          border:"none", borderRadius:9, padding:"10px 28px",
+          color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit",
+          opacity: saving ? 0.7 : 1,
+        }}>
+          {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Settings"}
+        </button>
+        <button onClick={()=>api.getConfig().then(r=>setCfg(r.data))} style={{
+          background:"transparent", border:"1px solid #1e3352", borderRadius:9,
+          padding:"10px 20px", color:"#475569", fontSize:13, cursor:"pointer", fontFamily:"inherit",
+        }}>Reset</button>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
 
   // ── REAL API CALLS ──
@@ -126,6 +295,12 @@ export default function Dashboard() {
     refetchInterval: 30000,
   });
 
+  const { data: sourcesData = [] } = useQuery({
+    queryKey: ["sources"],
+    queryFn:  () => api.getSources().then(r => r.data),
+    refetchInterval: 60000,
+  });
+
   const { data: briefData = {} } = useQuery({
     queryKey: ["brief"],
     queryFn:  () => api.getBrief().then(r => r.data),
@@ -146,7 +321,7 @@ export default function Dashboard() {
   const THREATS   = threats.length > 0 ? threats : FALLBACK_THREATS;
   const ENDPOINTS = FALLBACK_ENDPOINTS;
   const ACTIVITY  = FALLBACK_ACTIVITY;
-  const SOURCES   = FALLBACK_SOURCES;
+  const SOURCES   = sourcesData.length > 0 ? sourcesData : FALLBACK_SOURCES;
 
   // ── LOCAL STATE ──
   const [tab, setTab]             = useState("overview");
@@ -314,7 +489,7 @@ export default function Dashboard() {
                   </div>
                   {THREATS.filter(t=>!t.resolved).length === 0 ? (
                     <div style={{ textAlign:"center", padding:"40px 0", color:"#334155", fontSize:13 }}>
-                      Loading threats from API...
+                      Syncing threat feeds — first data appears within 30 seconds...
                     </div>
                   ) : (
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -445,7 +620,7 @@ export default function Dashboard() {
 
               {filteredThreats.length === 0 && (
                 <div style={{ textAlign:"center", padding:"60px 0", color:"#334155", fontSize:14 }}>
-                  {THREATS.length === 0 ? "Loading threats from API... Run seed.py if this persists." : "No threats match your filters."}
+                  {THREATS.length === 0 ? "Syncing from NVD, OTX and AbuseIPDB — threats will appear shortly." : "No threats match your filters."}
                 </div>
               )}
 
@@ -494,11 +669,11 @@ export default function Dashboard() {
                                 {t.ai_summary || t.summary || "AI summary not yet generated for this threat."}
                               </p>
                               <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                                <button style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#ef4444", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🚨 Escalate</button>
-                                <button onClick={()=>api.resolveTheat(t.id).then(()=>qc.invalidateQueries(["threats"]))}
+                                <button onClick={()=>window.electronAPI?.notify("ThreatLens – Escalation","Threat escalated: "+(t.title||t.cve||"Unknown"))} style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#ef4444", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🚨 Escalate</button>
+                                <button onClick={()=>api.resolveThreat(t.id).then(()=>qc.invalidateQueries(["threats"]))}
                                   style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>✓ Resolve</button>
-                                <button style={{ background:"rgba(56,189,248,0.08)", border:"1px solid rgba(56,189,248,0.2)", color:"#38bdf8", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🔗 View in NVD</button>
-                                {t.origin==="ENDPOINT" && <button style={{ background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.2)", color:"#f472b6", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🖥 Sandbox Report</button>}
+                                <button onClick={()=>t.cve&&window.open("https://nvd.nist.gov/vuln/detail/"+t.cve,"_blank")} style={{ background:"rgba(56,189,248,0.08)", border:"1px solid rgba(56,189,248,0.2)", color:"#38bdf8", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🔗 View in NVD</button>
+                                {t.origin==="ENDPOINT" && <button onClick={()=>alert("Sandbox analysis requires the endpoint agent to be running on the target machine.")} style={{ background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.2)", color:"#f472b6", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🖥 Sandbox Report</button>}
                               </div>
                             </div>
                           </div>
@@ -647,9 +822,9 @@ export default function Dashboard() {
                               </div>
                             )}
                             <div style={{ display:"flex", gap:8 }}>
-                              <button style={{ background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.2)", color:"#f472b6", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🧪 Sandbox Report</button>
-                              <button style={{ background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", color:"#a78bfa", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📋 Full Playbook</button>
-                              <button onClick={()=>api.resolveTheat(t.id).then(()=>qc.invalidateQueries(["incidents"]))}
+                              <button onClick={()=>alert("Sandbox analysis requires the endpoint agent to be running on the target machine.")} style={{ background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.2)", color:"#f472b6", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🧪 Sandbox Report</button>
+                              <button onClick={()=>alert("Playbook: Isolate machine → Run AV scan → Patch CVE → Rotate credentials → Review logs.")} style={{ background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", color:"#a78bfa", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📋 Full Playbook</button>
+                              <button onClick={()=>api.resolveThreat(t.id).then(()=>qc.invalidateQueries(["incidents"]))}
                                 style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>✓ Mark Resolved</button>
                             </div>
                           </div>
@@ -771,9 +946,9 @@ export default function Dashboard() {
                 </div>
 
                 <div style={{ padding:"14px 28px 20px", borderTop:"1px solid #0f1e2e", display:"flex", gap:8 }}>
-                  <button style={{ background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", color:"#a78bfa", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📋 Copy Brief</button>
-                  <button style={{ background:"rgba(56,189,248,0.08)", border:"1px solid rgba(56,189,248,0.2)", color:"#38bdf8", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📤 Export PDF</button>
-                  <button style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📨 Send to Team</button>
+                  <button onClick={()=>navigator.clipboard.writeText(briefData?.brief||"No brief available")} style={{ background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", color:"#a78bfa", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📋 Copy Brief</button>
+                  <button onClick={()=>alert("PDF export: copy the brief text and paste into your preferred editor.")} style={{ background:"rgba(56,189,248,0.08)", border:"1px solid rgba(56,189,248,0.2)", color:"#38bdf8", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📤 Export PDF</button>
+                  <button onClick={()=>navigator.clipboard.writeText(briefData?.brief||"").then(()=>alert("Brief copied — paste it into your team chat or email."))} style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📨 Send to Team</button>
                 </div>
               </div>
             </div>
@@ -809,6 +984,12 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
+          )}
+
+
+          {/* ══ SETTINGS ══ */}
+          {tab==="settings" && (
+            <SettingsPanel />
           )}
 
         </main>

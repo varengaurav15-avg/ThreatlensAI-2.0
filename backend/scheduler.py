@@ -6,13 +6,15 @@ from services.llm import summarize_threat
 from services.mitre import map_to_mitre
 from database import AsyncSessionLocal
 from models.threat import Threat
-import json
-from datetime import datetime
+import json, logging
+from datetime import datetime, timedelta
+
+logger = logging.getLogger("scheduler")
 
 scheduler = AsyncIOScheduler()
 
 async def fetch_and_store_cves():
-    print("Polling NVD...")
+    logger.info("Polling NVD...")
     try:
         cves = await fetch_recent_cves(hours_back=24)
         cve_ids = [c["cve"] for c in cves if c.get("cve")]
@@ -33,11 +35,15 @@ async def fetch_and_store_cves():
                 )
                 db.merge(threat)
             await db.commit()
-        print("Stored " + str(len(cves)) + " CVEs")
+        logger.info(f"Stored {len(cves)} CVEs")
     except Exception as e:
-        print("NVD poll failed: " + str(e))
+        logger.error(f"NVD poll failed: {e}")
 
 def start_scheduler():
-    scheduler.add_job(fetch_and_store_cves, 'interval', minutes=15, id='nvd_poll')
+    # Run immediately on first boot, then every 15 minutes
+    scheduler.add_job(
+        fetch_and_store_cves, 'interval', minutes=15, id='nvd_poll',
+        next_run_time=datetime.utcnow() + timedelta(seconds=5)  # 5 s after startup
+    )
     scheduler.start()
-    print("Scheduler started")
+    logger.info("Scheduler started — first NVD poll in 5 s")
