@@ -2,343 +2,405 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, socket } from "../api/index";
 
-// ── FALLBACK DATA (shown while API loads) ────────────────────
-const FALLBACK_THREATS = [];
+// ── FALLBACK DATA ────────────────────────────────────────────
 const FALLBACK_ENDPOINTS = [
-  { id:1, name:"DESKTOP-X",  os:"Windows 11",    ip:"192.168.1.42",  status:"INCIDENT", lastSeen:"Just now",  incidents:2, agent:"v2.1.4", cpu:78, mem:62 },
-  { id:2, name:"SERVER-01",  os:"Ubuntu 22.04",  ip:"192.168.1.10",  status:"INCIDENT", lastSeen:"2 min ago", incidents:1, agent:"v2.1.4", cpu:91, mem:84 },
-  { id:3, name:"LAPTOP-DEV", os:"macOS 14",      ip:"192.168.1.55",  status:"HEALTHY",  lastSeen:"5 min ago", incidents:0, agent:"v2.1.4", cpu:34, mem:48 },
-  { id:4, name:"WEB-SERVER", os:"Ubuntu 22.04",  ip:"192.168.1.20",  status:"HEALTHY",  lastSeen:"1 min ago", incidents:0, agent:"v2.1.4", cpu:22, mem:31 },
-  { id:5, name:"DB-SERVER",  os:"Windows Server",ip:"192.168.1.30",  status:"WARNING",  lastSeen:"3 min ago", incidents:0, agent:"v2.1.3", cpu:55, mem:77 },
-];
-const FALLBACK_ACTIVITY = [
-  { time:"08:42", msg:"NVD sync — waiting for first data...", type:"info" },
+  { id:1, name:"DESKTOP-X",  os:"Windows 11",     ip:"192.168.1.42", status:"INCIDENT", lastSeen:"Just now",  incidents:2, agent:"v2.1.4", cpu:78, mem:62 },
+  { id:2, name:"SERVER-01",  os:"Ubuntu 22.04",   ip:"192.168.1.10", status:"INCIDENT", lastSeen:"2 min ago", incidents:1, agent:"v2.1.4", cpu:91, mem:84 },
+  { id:3, name:"LAPTOP-DEV", os:"macOS 14",       ip:"192.168.1.55", status:"HEALTHY",  lastSeen:"5 min ago", incidents:0, agent:"v2.1.4", cpu:34, mem:48 },
+  { id:4, name:"WEB-SERVER", os:"Ubuntu 22.04",   ip:"192.168.1.20", status:"HEALTHY",  lastSeen:"1 min ago", incidents:0, agent:"v2.1.4", cpu:22, mem:31 },
+  { id:5, name:"DB-SERVER",  os:"Windows Server", ip:"192.168.1.30", status:"WARNING",  lastSeen:"3 min ago", incidents:0, agent:"v2.1.3", cpu:55, mem:77 },
 ];
 const FALLBACK_SOURCES = [
-  { name:"NVD CVE API",      url:"services.nvd.nist.gov",   count:0,  matched:0,  status:"ACTIVE", interval:"15 min",    icon:"🛡", color:"#38bdf8", lastSync:"--" },
-  { name:"AlienVault OTX",   url:"otx.alienvault.com",      count:0,  matched:0,  status:"ACTIVE", interval:"30 min",    icon:"👁", color:"#a78bfa", lastSync:"--" },
-  { name:"AbuseIPDB",        url:"abuseipdb.com",           count:0,  matched:0,  status:"ACTIVE", interval:"20 min",    icon:"🌐", color:"#fb923c", lastSync:"--" },
-  { name:"RSS Threat Feeds", url:"Krebs · BleepingComputer",count:0,  matched:0,  status:"ACTIVE", interval:"60 min",    icon:"📰", color:"#34d399", lastSync:"--" },
-  { name:"Endpoint Agents",  url:"Monitoring local machine",count:0,  matched:0,  status:"ACTIVE", interval:"Real-time", icon:"💻", color:"#f472b6", lastSync:"Live" },
-  { name:"EPSS API",         url:"first.org/epss",          count:0,  matched:0,  status:"ACTIVE", interval:"Daily",     icon:"📊", color:"#fbbf24", lastSync:"--" },
+  { name:"NVD CVE API",      count:0, matched:0, status:"ACTIVE", interval:"15 min",    color:"#ecc155", lastSync:"--" },
+  { name:"AlienVault OTX",   count:0, matched:0, status:"ACTIVE", interval:"30 min",    color:"#8b5cf6", lastSync:"--" },
+  { name:"AbuseIPDB",        count:0, matched:0, status:"ACTIVE", interval:"20 min",    color:"#f97316", lastSync:"--" },
+  { name:"RSS Feeds",        count:0, matched:0, status:"ACTIVE", interval:"60 min",    color:"#22c55e", lastSync:"--" },
+  { name:"Endpoint Agents",  count:0, matched:0, status:"ACTIVE", interval:"Real-time", color:"#ec4899", lastSync:"Live" },
+  { name:"EPSS API",         count:0, matched:0, status:"ACTIVE", interval:"Daily",     color:"#eab308", lastSync:"--" },
 ];
 
-// ── CONSTANTS ────────────────────────────────────────────────
-const SEV   = { CRITICAL:"#ef4444", HIGH:"#f97316", MEDIUM:"#eab308", LOW:"#22c55e" };
-const SEVBG = { CRITICAL:"rgba(239,68,68,0.1)", HIGH:"rgba(249,115,22,0.1)", MEDIUM:"rgba(234,179,8,0.1)", LOW:"rgba(34,197,94,0.1)" };
-const SRC   = { NVD:"#38bdf8", OTX:"#a78bfa", RSS:"#34d399", AbuseIPDB:"#fb923c", AGENT:"#f472b6" };
-const MCOL  = ["#38bdf8","#a78bfa","#fb923c","#34d399","#ef4444","#fbbf24"];
+// ── DESIGN TOKENS ────────────────────────────────────────────
+const C = {
+  bg:         "#061423",
+  surface:    "#0f1c2c",
+  raised:     "#132030",
+  border:     "#1e2b3b",
+  borderHi:   "#283646",
+  text:       "#d6e4f9",
+  text2:      "#b6c6ed",
+  text3:      "#9a907d",
+  accent:     "#ecc155",
+  accentDim:  "#b8922a",
+  critical:   "#ff4757",
+  high:       "#f97316",
+  medium:     "#ffa502",
+  low:        "#2ed573",
+};
 
+const SEV_COLOR = { CRITICAL: C.critical, HIGH: C.high, MEDIUM: C.medium, LOW: C.low };
+
+// ── NAV ITEMS ────────────────────────────────────────────────
 const NAV = [
-  { id:"overview",  label:"Overview",       icon:"M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-  { id:"threats",   label:"Global Threats", icon:"M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
-  { id:"endpoints", label:"My Endpoints",   icon:"M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" },
-  { id:"incidents", label:"Incidents",      icon:"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
-  { id:"brief",     label:"AI Brief",       icon:"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-  { id:"sources",   label:"Data Sources",   icon:"M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" },
-  { id:"settings",  label:"Settings",       icon:"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
+  { id:"overview",  label:"Overview",      icon:"M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" },
+  { id:"threats",   label:"Threats",       icon:"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
+  { id:"endpoints", label:"Endpoints",     icon:"M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 12H4v-2h11v2zm3-4H4v-2h14v2zm0-4H4V6h14v2z" },
+  { id:"incidents", label:"Incidents",     icon:"M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" },
+  { id:"brief",     label:"AI Brief",      icon:"M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" },
+  { id:"sources",   label:"Data Sources",  icon:"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" },
+  { id:"settings",  label:"Settings",      icon:"M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" },
 ];
 
-const NODES = [
-  { id:"apt29", label:"APT29",         type:"actor",   x:340, y:160, color:"#ef4444" },
-  { id:"apt28", label:"APT28",         type:"actor",   x:340, y:320, color:"#ef4444" },
-  { id:"cve1",  label:"CVE-2024-3400", type:"cve",     x:180, y:100, color:"#f97316" },
-  { id:"cve2",  label:"CVE-2024-21762",type:"cve",     x:180, y:220, color:"#f97316" },
-  { id:"cve3",  label:"CVE-2024-1709", type:"cve",     x:180, y:340, color:"#eab308" },
-  { id:"vpn",   label:"VPN Campaign",  type:"campaign",x:500, y:200, color:"#a78bfa" },
-  { id:"ia",    label:"Initial Access",type:"tactic",  x:500, y:330, color:"#38bdf8" },
-  { id:"exfil", label:"Exfiltration",  type:"tactic",  x:620, y:265, color:"#38bdf8" },
-];
-const EDGES = [
-  ["apt29","cve1"],["apt29","cve2"],["apt28","cve3"],["apt28","cve2"],
-  ["cve1","vpn"],["cve2","vpn"],["cve3","ia"],["vpn","exfil"],["ia","exfil"],
-];
-
-// ── SMALL COMPONENTS ─────────────────────────────────────────
-function SVGIcon({ d, size=18, color="currentColor" }) {
+// ── TINY UTILS ───────────────────────────────────────────────
+function Icon({ d, size = 16, color = "currentColor" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d={d}/>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ flexShrink: 0 }}>
+      <path d={d} />
     </svg>
   );
 }
 
-function Badge({ label, color, bg }) {
+function Dot({ color, pulse = false, size = 7 }) {
   return (
-    <span style={{ background:bg||`${color}18`, color, border:`1px solid ${color}30`, borderRadius:5, padding:"2px 8px", fontSize:10, fontWeight:700, letterSpacing:"0.4px", whiteSpace:"nowrap" }}>
+    <span style={{ position: "relative", display: "inline-flex", width: size, height: size, flexShrink: 0 }}>
+      {pulse && <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: color, opacity: 0.35, animation: "ping 2s ease-in-out infinite" }} />}
+      <span style={{ position: "relative", borderRadius: "50%", width: size, height: size, background: color, display: "block" }} />
+    </span>
+  );
+}
+
+function Chip({ label, color }) {
+  const bg = color + "18";
+  const bd = color + "35";
+  return (
+    <span style={{ background: bg, color, border: `1px solid ${bd}`, borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: 600, letterSpacing: "0.3px", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center" }}>
       {label}
     </span>
   );
 }
 
-function ScoreRing({ score, color, size=48 }) {
-  const r = (size/2)-5, circ = 2*Math.PI*r, dash = ((score||0)/100)*circ;
+function SevBar({ pct, color }) {
   return (
-    <div style={{ position:"relative", width:size, height:size, flexShrink:0 }}>
-      <svg width={size} height={size} style={{ transform:"rotate(-90deg)" }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={`${color}20`} strokeWidth="3"/>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="3" strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"/>
-      </svg>
-      <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-        <span style={{ fontSize:size>44?14:11, fontWeight:800, color, lineHeight:1 }}>{score||0}</span>
-      </div>
+    <div style={{ height: 3, background: C.border, borderRadius: 2, flex: 1 }}>
+      <div style={{ height: "100%", width: `${Math.min(100, pct)}%`, background: color, borderRadius: 2, transition: "width 0.8s ease" }} />
     </div>
   );
 }
 
-function Bar({ pct, color }) {
+function Toggle({ on, onChange }) {
   return (
-    <div style={{ height:6, background:"#0f1923", borderRadius:3, overflow:"hidden", flex:1 }}>
-      <div style={{ height:"100%", width:`${pct}%`, background:`linear-gradient(90deg,${color}99,${color})`, borderRadius:3, transition:"width 1.2s cubic-bezier(.4,0,.2,1)" }}/>
-    </div>
+    <button
+      onClick={onChange}
+      style={{
+        width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
+        background: on ? C.accent : C.raised, position: "relative", transition: "background 0.2s", flexShrink: 0,
+      }}
+    >
+      <div style={{
+        position: "absolute", top: 3, left: on ? 19 : 3, width: 16, height: 16,
+        borderRadius: "50%", background: "#fff", transition: "left 0.2s",
+      }} />
+    </button>
   );
 }
 
-function PulseDot({ color="#22c55e", size=8 }) {
-  return (
-    <span style={{ position:"relative", display:"inline-flex", width:size, height:size, flexShrink:0 }}>
-      <span style={{ position:"absolute", inset:0, borderRadius:"50%", background:color, opacity:0.4, animation:"ping 2s cubic-bezier(0,0,.2,1) infinite" }}/>
-      <span style={{ position:"relative", borderRadius:"50%", width:size, height:size, background:color, display:"block" }}/>
-    </span>
-  );
-}
-
-// ── MAIN DASHBOARD ───────────────────────────────────────────
-
-// ── SETTINGS PANEL ───────────────────────────────────────────
-function SettingsPanel() {
-  const [cfg, setCfg]       = useState(null);
-  const [saved, setSaved]   = useState(false);
+// ── SETTINGS ─────────────────────────────────────────────────
+function Settings() {
+  const [cfg, setCfg] = useState(null);
+  const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState("monitoring");
+  const [tab, setTab] = useState("monitoring");
 
   useEffect(() => {
     api.getConfig().then(r => setCfg(r.data)).catch(() => setCfg({
-      process:true, network:true, filesystem:true, logs:true,
-      responseMode:"conservative", aiEnabled:false, apiKey:"",
-      startOnBoot:false,
-      notifications:{desktop:true, tray:true, sound:false},
-      folders:["Documents","Desktop","Downloads"], exclusions:[],
+      process: true, network: true, filesystem: true, logs: true,
+      responseMode: "conservative", aiEnabled: false, apiKey: "",
+      startOnBoot: false,
+      notifications: { desktop: true, tray: true, sound: false },
     }));
   }, []);
 
   const save = async () => {
     setSaving(true);
-    try {
-      await api.saveConfig(cfg);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
-    } catch(e) {
-      alert("Could not save — backend not reachable.");
-    }
+    try { await api.saveConfig(cfg); setSaved(true); setTimeout(() => setSaved(false), 2500); }
+    catch { alert("Could not reach backend."); }
     setSaving(false);
   };
 
-  if (!cfg) return (
-    <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh",color:"#334155",fontSize:13}}>
-      Loading settings…
-    </div>
-  );
-
   const toggle = (key, sub) => {
-    if (sub) {
-      setCfg(c => ({...c, [key]: {...c[key], [sub]: !c[key][sub]}}));
-    } else {
-      setCfg(c => ({...c, [key]: !c[key]}));
-    }
+    if (sub) setCfg(c => ({ ...c, [key]: { ...c[key], [sub]: !c[key][sub] } }));
+    else setCfg(c => ({ ...c, [key]: !c[key] }));
   };
 
-  const STABS = [
-    {id:"monitoring", label:"Monitoring"},
-    {id:"response",   label:"Auto-Response"},
-    {id:"ai",         label:"AI & API Keys"},
-    {id:"notifs",     label:"Notifications"},
-  ];
+  if (!cfg) return <div style={{ padding: 40, color: C.text3, fontSize: 13 }}>Loading…</div>;
 
-  const Row = ({label, desc, on, onToggle}) => (
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0",borderBottom:"1px solid #0f1e2e"}}>
+  const TABS = ["monitoring", "response", "ai", "notifications"];
+  const Row = ({ label, desc, on, onToggle }) => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0", borderBottom: `1px solid ${C.border}` }}>
       <div>
-        <div style={{fontSize:13,color:"#e2e8f0",fontWeight:500}}>{label}</div>
-        {desc && <div style={{fontSize:11,color:"#334155",marginTop:3}}>{desc}</div>}
+        <div style={{ fontSize: 13, color: C.text, fontWeight: 500 }}>{label}</div>
+        {desc && <div style={{ fontSize: 12, color: C.text3, marginTop: 3 }}>{desc}</div>}
       </div>
-      <button onClick={onToggle} style={{
-        width:42, height:24, borderRadius:12, border:"none", cursor:"pointer",
-        background: on ? "linear-gradient(90deg,#2563eb,#3b82f6)" : "#0f1e2e",
-        position:"relative", transition:"background 0.2s", flexShrink:0,
-      }}>
-        <div style={{
-          position:"absolute", top:3, left: on?20:3, width:18, height:18,
-          borderRadius:"50%", background:"#fff", transition:"left 0.2s",
-        }}/>
-      </button>
+      <Toggle on={on} onChange={onToggle} />
     </div>
   );
 
   return (
-    <div className="fade-up" style={{padding:28, maxWidth:720}}>
-      <div style={{marginBottom:24}}>
-        <div style={{fontSize:20,fontWeight:700,color:"#e2e8f0"}}>Settings</div>
-        <div style={{fontSize:12,color:"#334155",marginTop:4}}>Configure ThreatLens AI monitoring and behaviour</div>
+    <div style={{ padding: "36px 40px", maxWidth: 680 }}>
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: "-0.4px" }}>Settings</div>
+        <div style={{ fontSize: 13, color: C.text3, marginTop: 6 }}>Configure monitoring behaviour and integrations</div>
       </div>
 
-      {/* Sub-tabs */}
-      <div style={{display:"flex",gap:4,marginBottom:24,background:"#07101a",borderRadius:10,padding:4}}>
-        {STABS.map(t => (
-          <button key={t.id} onClick={()=>setActiveTab(t.id)} style={{
-            flex:1, padding:"8px 0", borderRadius:8, border:"none", cursor:"pointer",
-            background: activeTab===t.id ? "#0f1e2e" : "transparent",
-            color: activeTab===t.id ? "#93c5fd" : "#475569",
-            fontSize:12, fontWeight: activeTab===t.id ? 600 : 400, fontFamily:"inherit",
-            transition:"all 0.15s",
-          }}>{t.label}</button>
+      <div style={{ display: "flex", gap: 2, marginBottom: 28, background: C.surface, borderRadius: 8, padding: 4 }}>
+        {TABS.map(t => (
+          <button key={t} onClick={() => setTab(t)} style={{
+            flex: 1, padding: "8px 0", borderRadius: 6, border: "none", cursor: "pointer",
+            background: tab === t ? C.raised : "transparent",
+            color: tab === t ? C.text : C.text3,
+            fontSize: 12, fontWeight: tab === t ? 600 : 400, fontFamily: "inherit",
+            textTransform: "capitalize", transition: "all 0.15s",
+          }}>{t}</button>
         ))}
       </div>
 
-      <div style={{background:"#07101a",border:"1px solid #0f1e2e",borderRadius:14,padding:"4px 20px 8px"}}>
-
-        {activeTab==="monitoring" && <>
-          <Row label="Process Monitoring"  desc="Track running processes and child spawns"           on={cfg.process}    onToggle={()=>toggle("process")}/>
-          <Row label="Network Monitoring"  desc="Monitor outbound connections and DNS queries"       on={cfg.network}    onToggle={()=>toggle("network")}/>
-          <Row label="Filesystem Watching" desc="Alert on changes in protected folders"              on={cfg.filesystem} onToggle={()=>toggle("filesystem")}/>
-          <Row label="Log Analysis"        desc="Parse Windows Event Logs for suspicious entries"    on={cfg.logs}       onToggle={()=>toggle("logs")}/>
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: "4px 24px 12px" }}>
+        {tab === "monitoring" && <>
+          <Row label="Process Monitoring"  desc="Track running processes and child spawns"         on={cfg.process}    onToggle={() => toggle("process")} />
+          <Row label="Network Monitoring"  desc="Monitor outbound connections and DNS queries"     on={cfg.network}    onToggle={() => toggle("network")} />
+          <Row label="Filesystem Watching" desc="Alert on changes in protected folders"            on={cfg.filesystem} onToggle={() => toggle("filesystem")} />
+          <Row label="Log Analysis"        desc="Parse Windows Event Logs for suspicious entries"  on={cfg.logs}       onToggle={() => toggle("logs")} />
         </>}
 
-        {activeTab==="response" && <>
-          <div style={{padding:"14px 0",borderBottom:"1px solid #0f1e2e"}}>
-            <div style={{fontSize:13,color:"#e2e8f0",fontWeight:500,marginBottom:10}}>Response Mode</div>
-            {["conservative","moderate","aggressive"].map(mode => (
-              <label key={mode} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,cursor:"pointer"}}>
-                <input type="radio" name="responseMode" checked={cfg.responseMode===mode}
-                  onChange={()=>setCfg(c=>({...c,responseMode:mode}))}
-                  style={{accentColor:"#3b82f6"}}/>
+        {tab === "response" && <>
+          <div style={{ padding: "20px 0", borderBottom: `1px solid ${C.border}` }}>
+            <div style={{ fontSize: 13, color: C.text, fontWeight: 500, marginBottom: 14 }}>Response Mode</div>
+            {[
+              { id: "conservative", label: "Conservative", desc: "Alert only — no automatic actions" },
+              { id: "moderate",     label: "Moderate",     desc: "Block network on high-severity threats" },
+              { id: "aggressive",   label: "Aggressive",   desc: "Auto-isolate machines on CRITICAL incidents" },
+            ].map(m => (
+              <label key={m.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, cursor: "pointer" }}>
+                <input type="radio" name="mode" checked={cfg.responseMode === m.id}
+                  onChange={() => setCfg(c => ({ ...c, responseMode: m.id }))} style={{ accentColor: C.accent }} />
                 <div>
-                  <span style={{fontSize:13,color:"#e2e8f0",textTransform:"capitalize"}}>{mode}</span>
-                  <span style={{fontSize:11,color:"#334155",marginLeft:8}}>
-                    {mode==="conservative" && "— Alert only, no automatic actions"}
-                    {mode==="moderate"     && "— Block network for high-severity threats"}
-                    {mode==="aggressive"   && "— Auto-isolate machines on CRITICAL incidents"}
-                  </span>
+                  <span style={{ fontSize: 13, color: C.text }}>{m.label}</span>
+                  <span style={{ fontSize: 12, color: C.text3, marginLeft: 8 }}>{m.desc}</span>
                 </div>
               </label>
             ))}
           </div>
-          <Row label="Start on Boot" desc="Launch ThreatLens AI with Windows" on={cfg.startOnBoot} onToggle={()=>toggle("startOnBoot")}/>
+          <Row label="Start on Boot" desc="Launch ThreatLens AI with Windows" on={cfg.startOnBoot} onToggle={() => toggle("startOnBoot")} />
         </>}
 
-        {activeTab==="ai" && <>
-          <div style={{padding:"16px 0",borderBottom:"1px solid #0f1e2e"}}>
-            <Row label="Enable AI Features" desc="Use GPT-4o to summarise threats and generate daily briefs" on={cfg.aiEnabled} onToggle={()=>toggle("aiEnabled")}/>
+        {tab === "ai" && <>
+          <div style={{ padding: "20px 0", borderBottom: `1px solid ${C.border}` }}>
+            <Row label="Enable AI Features" desc="Use GPT-4o for threat summaries and daily briefs" on={cfg.aiEnabled} onToggle={() => toggle("aiEnabled")} />
           </div>
-          <div style={{padding:"16px 0"}}>
-            <div style={{fontSize:13,color:"#e2e8f0",fontWeight:500,marginBottom:6}}>OpenAI API Key</div>
-            <div style={{fontSize:11,color:"#334155",marginBottom:10}}>Required for AI summaries and daily briefs. Get yours at platform.openai.com</div>
+          <div style={{ padding: "20px 0" }}>
+            <div style={{ fontSize: 13, color: C.text, fontWeight: 500, marginBottom: 6 }}>OpenAI API Key</div>
+            <div style={{ fontSize: 12, color: C.text3, marginBottom: 12 }}>Required for AI summaries and the daily brief. Get yours at platform.openai.com</div>
             <input
               type="password"
-              value={cfg.apiKey||""}
-              onChange={e=>setCfg(c=>({...c,apiKey:e.target.value}))}
+              value={cfg.apiKey || ""}
+              onChange={e => setCfg(c => ({ ...c, apiKey: e.target.value }))}
               placeholder="sk-..."
               style={{
-                width:"100%", padding:"10px 14px", background:"#040c16",
-                border:"1px solid #1e3352", borderRadius:8, color:"#e2e8f0",
-                fontSize:13, fontFamily:"monospace",
+                width: "100%", padding: "10px 14px",
+                background: C.bg, border: `1px solid ${C.border}`,
+                borderRadius: 8, color: C.text, fontSize: 13, fontFamily: "monospace",
+                outline: "none",
               }}
             />
           </div>
         </>}
 
-        {activeTab==="notifs" && <>
-          <Row label="Desktop Notifications" desc="Show Windows toast notifications for incidents"     on={cfg.notifications?.desktop} onToggle={()=>toggle("notifications","desktop")}/>
-          <Row label="Tray Alerts"           desc="Show alerts in the system tray"                    on={cfg.notifications?.tray}    onToggle={()=>toggle("notifications","tray")}/>
-          <Row label="Sound Alerts"          desc="Play a sound on CRITICAL incidents"                on={cfg.notifications?.sound}   onToggle={()=>toggle("notifications","sound")}/>
+        {tab === "notifications" && <>
+          <Row label="Desktop Notifications" desc="Windows toast notifications for new incidents"  on={cfg.notifications?.desktop} onToggle={() => toggle("notifications", "desktop")} />
+          <Row label="Tray Alerts"           desc="Alerts in the Windows system tray"             on={cfg.notifications?.tray}    onToggle={() => toggle("notifications", "tray")} />
+          <Row label="Sound Alerts"          desc="Play a sound on CRITICAL incidents"            on={cfg.notifications?.sound}   onToggle={() => toggle("notifications", "sound")} />
         </>}
-
       </div>
 
-      <div style={{display:"flex",gap:10,marginTop:20}}>
+      <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
         <button onClick={save} disabled={saving} style={{
-          background:"linear-gradient(135deg,#2563eb,#1d4ed8)",
-          border:"none", borderRadius:9, padding:"10px 28px",
-          color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit",
-          opacity: saving ? 0.7 : 1,
+          background: C.accent, border: "none", borderRadius: 8, padding: "10px 24px",
+          color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+          opacity: saving ? 0.7 : 1, transition: "opacity 0.2s",
         }}>
-          {saving ? "Saving…" : saved ? "✓ Saved!" : "Save Settings"}
+          {saving ? "Saving…" : saved ? "Saved" : "Save changes"}
         </button>
-        <button onClick={()=>api.getConfig().then(r=>setCfg(r.data))} style={{
-          background:"transparent", border:"1px solid #1e3352", borderRadius:9,
-          padding:"10px 20px", color:"#475569", fontSize:13, cursor:"pointer", fontFamily:"inherit",
+        <button onClick={() => api.getConfig().then(r => setCfg(r.data))} style={{
+          background: "transparent", border: `1px solid ${C.border}`, borderRadius: 8,
+          padding: "10px 20px", color: C.text3, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
         }}>Reset</button>
       </div>
     </div>
   );
 }
 
-export default function Dashboard() {
+// ── SANDBOX BUTTON ───────────────────────────────────────────
+function SandboxButton({ filePath }) {
+  const [state, setState] = useState("idle");   // idle | loading | done | error
+  const [report, setReport] = useState(null);
+  const [jobId, setJobId]   = useState(null);
 
-  // ── REAL API CALLS ──
+  // Extract file path from raw_data (which is a JSON-encoded string)
+  const extractPath = (raw) => {
+    if (!raw) return null;
+    // raw_data is stored as a JSON string — parse it first to get the path field
+    try {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (parsed?.path) return parsed.path;
+    } catch {}
+    // Fallback: regex match, handling both single and double-escaped backslashes
+    const normalised = typeof raw === "string" ? raw.replace(/\\\\/g, "\\") : raw;
+    const m = normalised.match(/[A-Z]:[\\\/][^\s"']+\.(exe|dll|bat|cmd|ps1|vbs|msi|scr|pif|lnk)/i);
+    return m ? m[0] : null;
+  };
+
+  const path = extractPath(filePath);
+  if (!path) return null;
+
+  const poll = async (jid) => {
+    for (let i = 0; i < 20; i++) {
+      await new Promise(r => setTimeout(r, 15000));
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/api/sandbox/result/${jid}`);
+        const data = await res.json();
+        if (data.state === "complete") { setReport(data); setState("done"); return; }
+        if (data.error) { setState("error"); return; }
+      } catch { setState("error"); return; }
+    }
+    setState("error");
+  };
+
+  const analyze = async () => {
+    setState("loading");
+    try {
+      const res  = await fetch("http://127.0.0.1:8000/api/sandbox/analyze", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file_path: path }),
+      });
+      const data = await res.json();
+      if (data.error) { setState("error"); return; }
+      setJobId(data.job_id);
+      poll(data.job_id);
+    } catch { setState("error"); }
+  };
+
+  const VERDICT_COLOR = { CRITICAL: "#ef4444", HIGH: "#f97316", MEDIUM: "#eab308", LOW: "#22c55e" };
+
+  if (state === "done" && report) {
+    const vc = VERDICT_COLOR[report.verdict] || "#8899aa";
+    return (
+      <div style={{ background: vc + "10", border: `1px solid ${vc}30`, borderRadius: 10, padding: "14px 16px", marginBottom: 4 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+          <span style={{ color: vc, fontWeight: 700, fontSize: 13 }}>{report.verdict}</span>
+          <span style={{ color: "#8899aa", fontSize: 12 }}>Hybrid Analysis Sandbox</span>
+          <span style={{ color: "#8899aa", fontSize: 12 }}>·</span>
+          <span style={{ color: "#8899aa", fontSize: 12 }}>{report.av_detect}% AV detection</span>
+          <a href={report.analysis_url} target="_blank" rel="noreferrer"
+            style={{ marginLeft: "auto", color: C.accent, fontSize: 12, textDecoration: "none" }}>
+            Full report →
+          </a>
+        </div>
+        {report.signatures?.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {report.signatures.slice(0, 5).map((s, i) => (
+              <span key={i} style={{ background: vc + "15", color: vc, border: `1px solid ${vc}25`,
+                borderRadius: 4, padding: "2px 8px", fontSize: 11 }}>{s}</span>
+            ))}
+          </div>
+        )}
+        {report.domains?.length > 0 && (
+          <div style={{ marginTop: 8, fontSize: 11, color: "#8899aa" }}>
+            Contacted: {report.domains.slice(0, 3).join(", ")}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <button onClick={analyze} disabled={state === "loading"} style={{
+      background: "#f97316" + "14", border: "1px solid #f9731630",
+      color: "#f97316", padding: "7px 14px", borderRadius: 8,
+      fontSize: 12, fontWeight: 500, cursor: state === "loading" ? "wait" : "pointer",
+      marginBottom: 8, opacity: state === "loading" ? 0.7 : 1,
+    }}>
+      {state === "loading" ? "Analyzing... (2-5 min)" : state === "error" ? "Analysis failed — retry" : "Analyze in Sandbox"}
+    </button>
+  );
+}
+
+// ── MAIN DASHBOARD ───────────────────────────────────────────
+export default function Dashboard() {
   const qc = useQueryClient();
 
-  const { data: threats = FALLBACK_THREATS } = useQuery({
+  const { data: threats = [] } = useQuery({
     queryKey: ["threats"],
-    queryFn:  () => api.getThreats().then(r => r.data),
+    queryFn: () => api.getThreats().then(r => r.data),
     refetchInterval: 30000,
   });
 
   const { data: incidents = [] } = useQuery({
     queryKey: ["incidents"],
-    queryFn:  () => api.getIncidents().then(r => r.data),
+    queryFn: () => api.getIncidents().then(r => r.data),
     refetchInterval: 10000,
   });
 
   const { data: stats = {} } = useQuery({
     queryKey: ["stats"],
-    queryFn:  () => api.getStats().then(r => r.data),
+    queryFn: () => api.getStats().then(r => r.data),
     refetchInterval: 30000,
   });
 
   const { data: sourcesData = [] } = useQuery({
     queryKey: ["sources"],
-    queryFn:  () => api.getSources().then(r => r.data),
+    queryFn: () => api.getSources().then(r => r.data),
     refetchInterval: 60000,
   });
 
   const { data: briefData = {} } = useQuery({
     queryKey: ["brief"],
-    queryFn:  () => api.getBrief().then(r => r.data),
+    queryFn: () => api.getBrief().then(r => r.data),
   });
 
-  // Real-time WebSocket — new incident → refresh all data + notify
+  const { data: endpointsData = [] } = useQuery({
+    queryKey: ["endpoints"],
+    queryFn: () => api.getEndpoints().then(r => r.data),
+    refetchInterval: 10000,
+  });
+
   useEffect(() => {
     socket.on("new_incident", (data) => {
       qc.invalidateQueries(["threats"]);
       qc.invalidateQueries(["incidents"]);
       qc.invalidateQueries(["stats"]);
+      qc.invalidateQueries(["endpoints"]);
       window.electronAPI?.notify("ThreatLens Alert", data?.title || "New incident detected");
     });
     return () => socket.off("new_incident");
   }, []);
 
-  // Use real data — fall back to static while loading
-  const THREATS   = threats.length > 0 ? threats : FALLBACK_THREATS;
-  const ENDPOINTS = FALLBACK_ENDPOINTS;
-  const ACTIVITY  = FALLBACK_ACTIVITY;
   const SOURCES   = sourcesData.length > 0 ? sourcesData : FALLBACK_SOURCES;
+  const ENDPOINTS = endpointsData.length > 0 ? endpointsData : FALLBACK_ENDPOINTS;
 
-  // ── LOCAL STATE ──
-  const [tab, setTab]             = useState("overview");
-  const [selected, setSelected]   = useState(null);
+  const [tab, setTab]         = useState("overview");
+  const [expanded, setExpanded] = useState(null);
   const [sevFilter, setSevFilter] = useState("ALL");
   const [originFilter, setOriginFilter] = useState("ALL");
-  const [search, setSearch]       = useState("");
-  const [briefSection, setBriefSection] = useState(0);
+  const [search, setSearch]   = useState("");
+  const [briefTab, setBriefTab] = useState(0);
 
-  // ── COMPUTED VALUES ──
-  const critCount    = stats.critical ?? THREATS.filter(t=>t.severity==="CRITICAL"&&!t.resolved).length;
-  const epCount      = stats.endpoint ?? THREATS.filter(t=>t.origin==="ENDPOINT"&&!t.resolved).length;
-  const resolvedCount= stats.resolved ?? THREATS.filter(t=>t.resolved).length;
+  const critCount     = stats.critical ?? threats.filter(t => t.severity === "CRITICAL" && !t.resolved).length;
+  const epCount       = stats.endpoint ?? threats.filter(t => t.origin === "ENDPOINT" && !t.resolved).length;
+  const resolvedCount = stats.resolved ?? threats.filter(t => t.resolved).length;
+  const totalCount    = stats.total    ?? threats.length;
 
-  const filteredThreats = THREATS.filter(t => {
-    const s = sevFilter==="ALL"    || t.severity===sevFilter;
-    const o = originFilter==="ALL" || t.origin===originFilter;
+  const filteredThreats = threats.filter(t => {
+    const s = sevFilter === "ALL"    || t.severity === sevFilter;
+    const o = originFilter === "ALL" || t.origin === originFilter;
     const q = !search || t.title?.toLowerCase().includes(search.toLowerCase()) || t.cve?.toLowerCase().includes(search.toLowerCase());
     return s && o && q;
   });
@@ -349,420 +411,442 @@ export default function Dashboard() {
     try { return JSON.parse(tags); } catch { return []; }
   };
 
+  const navBadge = (id) => {
+    if (id === "threats")   return threats.filter(t => !t.resolved && t.origin === "GLOBAL").length || null;
+    if (id === "incidents") return epCount || null;
+    return null;
+  };
+
+  // ── RENDER ─────────────────────────────────────────────────
   return (
-    <div style={{ display:"flex", height:"100vh", background:"#060c14", color:"#cbd5e1", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:14, overflow:"hidden" }}>
+    <div style={{ display: "flex", height: "100vh", background: C.bg, color: C.text, fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: 14, overflow: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
-        ::-webkit-scrollbar{width:4px;height:4px}
-        ::-webkit-scrollbar-thumb{background:#1e3352;border-radius:4px}
-        ::-webkit-scrollbar-track{background:transparent}
-        @keyframes ping{75%,100%{transform:scale(2);opacity:0}}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .fade-up{animation:fadeUp 0.4s cubic-bezier(.4,0,.2,1) forwards}
-        .nav-btn{transition:all 0.18s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
-        .nav-btn:hover .nav-label{color:#e2e8f0!important}
-        .nav-btn:hover .nav-bg{background:rgba(255,255,255,0.04)!important}
-        .card{transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s}
-        .card:hover{border-color:#1e3352!important;transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
-        .threat-row{transition:background 0.15s,border-color 0.15s;cursor:pointer}
-        .threat-row:hover{background:#0c1825!important;border-color:#1e3352!important}
-        .threat-row.sel{background:#0c1825!important;border-color:#2563eb!important}
-        .chip{transition:all 0.15s;cursor:pointer;border:none;font-family:inherit}
-        .chip:hover{opacity:0.8}
-        .ep-row{transition:background 0.15s;cursor:pointer}
-        .ep-row:hover{background:#0c1825!important}
-        input{outline:none}
-        input::placeholder{color:#334155}
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        @keyframes ping { 0%,100% { opacity: 0.35; } 50% { opacity: 0; transform: scale(1.8); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-up { animation: fadeUp 0.3s ease forwards; }
+        .nav-item { transition: background 0.15s, color 0.15s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
+        .nav-item:hover .nav-text { color: ${C.text} !important; }
+        .nav-item:hover .nav-icon { opacity: 0.7; }
+        .threat-row { transition: background 0.12s; cursor: pointer; }
+        .threat-row:hover { background: ${C.raised} !important; }
+        .btn-ghost { transition: background 0.15s, color 0.15s; cursor: pointer; border: none; font-family: inherit; }
+        .btn-ghost:hover { background: ${C.raised} !important; }
+        input { outline: none; }
+        input::placeholder { color: ${C.text3}; }
+        button { font-family: inherit; }
       `}</style>
 
       {/* ── SIDEBAR ── */}
-      <aside style={{ width:232, background:"#07101a", borderRight:"1px solid #0f1e2e", display:"flex", flexDirection:"column", flexShrink:0 }}>
-        <div style={{ padding:"24px 20px 18px" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:11, marginBottom:14 }}>
-            <div style={{ width:36, height:36, background:"linear-gradient(135deg,#ef4444 0%,#f97316 100%)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0, boxShadow:"0 4px 16px rgba(239,68,68,0.3)" }}>⚡</div>
+      <aside style={{ width: 220, background: C.surface, borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column", flexShrink: 0 }}>
+        {/* Logo */}
+        <div style={{ padding: "24px 20px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 32, height: 32, background: "linear-gradient(135deg, #b8922a, #ecc155)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
             <div>
-              <div style={{ fontSize:17, fontWeight:700, color:"#f1f5f9", letterSpacing:"-0.4px", lineHeight:1 }}>ThreatLens</div>
-              <div style={{ fontSize:10, color:"#ef4444", letterSpacing:"2.5px", fontWeight:600, marginTop:2 }}>AI PLATFORM</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.text, letterSpacing: "-0.3px" }}>ThreatLens</div>
+              <div style={{ fontSize: 10, color: C.text3, letterSpacing: "0.5px", marginTop: 1 }}>AI Platform</div>
             </div>
           </div>
-          <div style={{ background:"#0c1825", border:"1px solid #0f1e2e", borderRadius:8, padding:"8px 12px", display:"flex", alignItems:"center", gap:8 }}>
-            <PulseDot color="#22c55e" size={7}/>
-            <span style={{ fontSize:11, color:"#64748b" }}>All systems operational</span>
+
+          {/* Status */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: C.bg, borderRadius: 8, border: `1px solid ${C.border}` }}>
+            <Dot color={C.low} pulse size={7} />
+            <span style={{ fontSize: 12, color: C.text3 }}>All systems live</span>
           </div>
         </div>
 
-        <nav style={{ padding:"4px 12px", flex:1 }}>
-          <div style={{ fontSize:10, color:"#1e3352", letterSpacing:"1.5px", padding:"8px 8px 6px", fontWeight:600 }}>MENU</div>
+        {/* Nav */}
+        <nav style={{ padding: "0 12px", flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
           {NAV.map(n => {
-            const active = tab===n.id;
-            const badge = n.id==="threats"   ? THREATS.filter(t=>!t.resolved&&t.origin==="GLOBAL").length
-                        : n.id==="incidents" ? epCount
-                        : null;
+            const active = tab === n.id;
+            const badge  = navBadge(n.id);
             return (
-              <button key={n.id} className="nav-btn" onClick={()=>{setTab(n.id);setSelected(null);}}>
-                <div className="nav-bg" style={{ display:"flex", alignItems:"center", gap:10, padding:"9px 10px", borderRadius:9, marginBottom:1,
-                  background: active?"rgba(37,99,235,0.14)":"transparent",
-                  borderLeft: active?"2px solid #3b82f6":"2px solid transparent",
+              <button key={n.id} className="nav-item" onClick={() => { setTab(n.id); setExpanded(null); }}>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 8,
+                  background: active ? C.bg : "transparent",
+                  borderLeft: `2px solid ${active ? C.accent : "transparent"}`,
                 }}>
-                  <SVGIcon d={n.icon} size={17} color={active?"#60a5fa":"#334155"}/>
-                  <span className="nav-label" style={{ fontSize:13, fontWeight:active?600:400, color:active?"#93c5fd":"#475569", flex:1 }}>{n.label}</span>
-                  {badge>0 && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:10, padding:"1px 7px", borderRadius:20, fontWeight:700 }}>{badge}</span>}
+                  <Icon d={n.icon} size={15} color={active ? C.accent : C.text3} />
+                  <span className="nav-text" style={{ fontSize: 13, fontWeight: active ? 600 : 400, color: active ? C.text : C.text3, flex: 1 }}>
+                    {n.label}
+                  </span>
+                  {badge > 0 && (
+                    <span style={{ fontSize: 11, fontWeight: 700, color: C.critical, background: C.critical + "18", borderRadius: 20, padding: "1px 7px" }}>
+                      {badge}
+                    </span>
+                  )}
                 </div>
               </button>
             );
           })}
         </nav>
 
-        <div style={{ padding:"14px 16px", borderTop:"1px solid #0f1e2e" }}>
-          <div style={{ background:"#0c1825", borderRadius:10, padding:"11px 13px", display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:32, height:32, background:"linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, flexShrink:0 }}>A</div>
-            <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontSize:12, color:"#e2e8f0", fontWeight:600 }}>SOC Analyst</div>
-              <div style={{ fontSize:11, color:"#334155" }}>Tier 2 · Active</div>
+        {/* User */}
+        <div style={{ padding: "16px 14px", borderTop: `1px solid ${C.border}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 30, height: 30, background: `linear-gradient(135deg, ${C.accentDim}, ${C.accent})`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+              S
             </div>
-            <div style={{ width:7, height:7, borderRadius:"50%", background:"#22c55e", flexShrink:0 }}/>
+            <div>
+              <div style={{ fontSize: 12, color: C.text, fontWeight: 600 }}>SOC Analyst</div>
+              <div style={{ fontSize: 11, color: C.text3 }}>Tier 2</div>
+            </div>
+            <Dot color={C.low} size={6} style={{ marginLeft: "auto" }} />
           </div>
         </div>
       </aside>
 
-      {/* ── MAIN CONTENT ── */}
-      <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      {/* ── MAIN ── */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
-        {/* Top bar */}
-        <header style={{ height:58, borderBottom:"1px solid #0f1e2e", background:"#07101a", display:"flex", alignItems:"center", padding:"0 28px", gap:16, flexShrink:0 }}>
-          <div style={{ flex:1 }}>
-            <span style={{ fontSize:18, fontWeight:700, color:"#f1f5f9", letterSpacing:"-0.3px" }}>
-              {NAV.find(n=>n.id===tab)?.label}
+        {/* Header */}
+        <header style={{ height: 56, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", padding: "0 32px", gap: 16, flexShrink: 0 }}>
+          <div style={{ flex: 1 }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: C.text, letterSpacing: "-0.2px" }}>
+              {NAV.find(n => n.id === tab)?.label}
             </span>
-            <span style={{ fontSize:12, color:"#334155", marginLeft:12 }}>
-              {tab==="overview"  && "Unified threat landscape"}
-              {tab==="threats"   && `${filteredThreats.filter(t=>t.origin==="GLOBAL").length} global threats`}
-              {tab==="endpoints" && `${ENDPOINTS.length} machines monitored`}
-              {tab==="incidents" && `${epCount} active incidents`}
-              {tab==="brief"     && "AI-generated · daily at 08:00"}
-              {tab==="sources"   && `${SOURCES.length} active sources`}
+            <span style={{ fontSize: 12, color: C.text3, marginLeft: 12 }}>
+              {tab === "overview"  && "Unified threat landscape"}
+              {tab === "threats"   && `${filteredThreats.length} threats`}
+              {tab === "endpoints" && `${ENDPOINTS.length} machines monitored`}
+              {tab === "incidents" && `${epCount} active`}
+              {tab === "brief"     && "AI-generated daily report"}
+              {tab === "sources"   && `${SOURCES.length} active feeds`}
+              {tab === "settings"  && "Preferences"}
             </span>
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            {epCount>0 && (
-              <div style={{ display:"flex", alignItems:"center", gap:7, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", borderRadius:8, padding:"6px 12px" }}>
-                <PulseDot color="#ef4444" size={7}/>
-                <span style={{ fontSize:12, color:"#ef4444", fontWeight:600 }}>{epCount} Live Incident{epCount>1?"s":""}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {epCount > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 7, background: C.critical + "12", border: `1px solid ${C.critical}30`, borderRadius: 8, padding: "6px 12px" }}>
+                <Dot color={C.critical} pulse size={6} />
+                <span style={{ fontSize: 12, color: C.critical, fontWeight: 600 }}>{epCount} live incident{epCount > 1 ? "s" : ""}</span>
               </div>
             )}
-            <div style={{ background:"#0c1825", border:"1px solid #0f1e2e", borderRadius:8, padding:"6px 13px", fontSize:12, color:"#475569" }}>
-              {new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})} UTC
+            <div style={{ fontSize: 12, color: C.text3, fontVariantNumeric: "tabular-nums" }}>
+              {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </div>
           </div>
         </header>
 
-        <main style={{ flex:1, overflow:"auto" }}>
+        {/* Page content */}
+        <main style={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
 
           {/* ══ OVERVIEW ══ */}
-          {tab==="overview" && (
-            <div className="fade-up" style={{ padding:28 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:22 }}>
+          {tab === "overview" && (
+            <div className="fade-up" style={{ padding: "32px 40px" }}>
+
+              {/* Metrics */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
                 {[
-                  { label:"Critical Threats", val:critCount,     sub:"unresolved",     color:"#ef4444", icon:"🔴", bg:"rgba(239,68,68,0.06)" },
-                  { label:"Live Incidents",   val:epCount,       sub:"on endpoints",   color:"#f472b6", icon:"💻", bg:"rgba(244,114,182,0.06)" },
-                  { label:"CVEs Ingested",    val:stats.total??THREATS.filter(t=>t.origin==="GLOBAL").length, sub:"since midnight", color:"#38bdf8", icon:"📡", bg:"rgba(56,189,248,0.06)" },
-                  { label:"Resolved Today",   val:resolvedCount, sub:"last 24 hours",  color:"#22c55e", icon:"✓",  bg:"rgba(34,197,94,0.06)" },
-                ].map((m,i)=>(
-                  <div key={i} className="card" style={{ background:m.bg, border:`1px solid ${m.color}18`, borderRadius:14, padding:"20px 22px" }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
-                      <span style={{ fontSize:11, color:m.color, fontWeight:600, letterSpacing:"0.3px", textTransform:"uppercase" }}>{m.label}</span>
-                      <span style={{ fontSize:22 }}>{m.icon}</span>
-                    </div>
-                    <div style={{ fontSize:44, fontWeight:800, color:"#f8fafc", lineHeight:1, marginBottom:4, fontFamily:"'Instrument Serif',serif" }}>{m.val}</div>
-                    <div style={{ fontSize:12, color:"#475569" }}>{m.sub}</div>
+                  { label: "Critical threats", value: critCount,     sub: "unresolved",     color: C.critical },
+                  { label: "Live incidents",    value: epCount,       sub: "on endpoints",   color: C.high },
+                  { label: "CVEs ingested",     value: totalCount,    sub: "all sources",    color: C.accent },
+                  { label: "Resolved today",    value: resolvedCount, sub: "last 24 hours",  color: C.low },
+                ].map((m, i) => (
+                  <div key={i} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: "22px 24px" }}>
+                    <div style={{ fontSize: 12, color: C.text3, marginBottom: 14, fontWeight: 500 }}>{m.label}</div>
+                    <div style={{ fontSize: 40, fontWeight: 800, color: m.color, letterSpacing: "-1px", lineHeight: 1, marginBottom: 6 }}>{m.value}</div>
+                    <div style={{ fontSize: 12, color: C.text3 }}>{m.sub}</div>
                   </div>
                 ))}
               </div>
 
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14, marginBottom:22 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
+
                 {/* Priority queue */}
-                <div className="card" style={{ background:"#07101a", border:"1px solid #0f1e2e", borderRadius:14, padding:20, gridColumn:"span 2" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-                    <div style={{ fontSize:13, fontWeight:600, color:"#e2e8f0" }}>Unified Priority Queue</div>
-                    <button onClick={()=>setTab("threats")} style={{ background:"none", border:"1px solid #1e3352", borderRadius:6, padding:"4px 12px", color:"#60a5fa", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>View all →</button>
+                <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+                  <div style={{ padding: "20px 24px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.border}` }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>Top threats</span>
+                    <button onClick={() => setTab("threats")} className="btn-ghost" style={{ fontSize: 12, color: C.accent, padding: "4px 10px", borderRadius: 6, background: "transparent" }}>
+                      See all →
+                    </button>
                   </div>
-                  {THREATS.filter(t=>!t.resolved).length === 0 ? (
-                    <div style={{ textAlign:"center", padding:"40px 0", color:"#334155", fontSize:13 }}>
-                      Syncing threat feeds — first data appears within 30 seconds...
+
+                  {threats.filter(t => !t.resolved).length === 0 ? (
+                    <div style={{ padding: "48px 24px", textAlign: "center", color: C.text3, fontSize: 13 }}>
+                      Syncing threat feeds — data appears within 30 seconds…
                     </div>
                   ) : (
-                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                      {THREATS.filter(t=>!t.resolved).slice(0,5).map((t,i)=>(
-                        <div key={i} style={{ display:"flex", alignItems:"center", gap:12, background:"#0c1825", borderRadius:10, padding:"11px 14px" }}>
-                          <div style={{ fontSize:12, color:"#334155", fontWeight:700, width:16, textAlign:"center" }}>#{i+1}</div>
-                          <ScoreRing score={Math.round(t.priority_score??t.score??0)} color={SEV[t.severity]||"#ef4444"} size={40}/>
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ fontSize:13, color:"#cbd5e1", fontWeight:500, marginBottom:3, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{t.title}</div>
-                            <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                              <Badge label={t.severity} color={SEV[t.severity]||"#ef4444"}/>
-                              <Badge label={t.origin==="ENDPOINT"?"ENDPOINT":"GLOBAL"} color={t.origin==="ENDPOINT"?"#f472b6":"#38bdf8"}/>
-                              {t.asset_match && <Badge label="ASSET MATCH" color="#22c55e"/>}
+                    threats.filter(t => !t.resolved).slice(0, 6).map((t, i) => {
+                      const sev   = t.severity || "MEDIUM";
+                      const color = SEV_COLOR[sev] || C.accent;
+                      const score = Math.round(t.priority_score ?? 0);
+                      return (
+                        <div key={i} className="threat-row" style={{
+                          display: "flex", alignItems: "center", gap: 14,
+                          padding: "14px 24px",
+                          background: C.surface,
+                          borderBottom: `1px solid ${C.border}`,
+                          borderLeft: `3px solid ${color}`,
+                        }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 13, color: C.text, fontWeight: 500, marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
+                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                              {t.cve && <span style={{ fontSize: 11, color: C.accent, fontWeight: 600 }}>{t.cve}</span>}
+                              <span style={{ fontSize: 11, color: C.text3 }}>{t.source || "—"}</span>
                             </div>
                           </div>
-                          <div style={{ fontSize:11, color:"#334155", flexShrink:0 }}>{t.ts || t.created_at?.slice(11,16) || "--"}</div>
+                          <Chip label={sev} color={color} />
+                          <span style={{ fontSize: 13, fontWeight: 700, color, minWidth: 28, textAlign: "right" }}>{score}</span>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })
                   )}
                 </div>
 
-                {/* Severity split */}
-                <div className="card" style={{ background:"#07101a", border:"1px solid #0f1e2e", borderRadius:14, padding:20 }}>
-                  <div style={{ fontSize:13, fontWeight:600, color:"#e2e8f0", marginBottom:18 }}>Severity Split</div>
-                  {[
-                    { label:"Critical", count:THREATS.filter(t=>t.severity==="CRITICAL").length, pct:80, color:"#ef4444" },
-                    { label:"High",     count:THREATS.filter(t=>t.severity==="HIGH").length,     pct:60, color:"#f97316" },
-                    { label:"Medium",   count:THREATS.filter(t=>t.severity==="MEDIUM").length,   pct:20, color:"#eab308" },
-                    { label:"Low",      count:THREATS.filter(t=>t.severity==="LOW").length,      pct:40, color:"#22c55e" },
-                  ].map((b,i)=>(
-                    <div key={i} style={{ marginBottom:15 }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-                        <span style={{ fontSize:12, color:"#94a3b8" }}>{b.label}</span>
-                        <span style={{ fontSize:12, color:b.color, fontWeight:700 }}>{b.count}</span>
-                      </div>
-                      <Bar pct={Math.min(100, b.count * 20)} color={b.color}/>
-                    </div>
-                  ))}
-                  <div style={{ marginTop:20, paddingTop:16, borderTop:"1px solid #0f1e2e" }}>
-                    <div style={{ fontSize:11, color:"#334155", marginBottom:10, letterSpacing:"0.5px" }}>ORIGIN SPLIT</div>
-                    <div style={{ display:"flex", gap:8 }}>
-                      <div style={{ flex:1, background:"rgba(56,189,248,0.06)", border:"1px solid rgba(56,189,248,0.12)", borderRadius:8, padding:"10px 12px", textAlign:"center" }}>
-                        <div style={{ fontSize:22, fontWeight:800, color:"#38bdf8", fontFamily:"'Instrument Serif',serif" }}>{THREATS.filter(t=>t.origin==="GLOBAL").length}</div>
-                        <div style={{ fontSize:10, color:"#475569", marginTop:2 }}>Global</div>
-                      </div>
-                      <div style={{ flex:1, background:"rgba(244,114,182,0.06)", border:"1px solid rgba(244,114,182,0.12)", borderRadius:8, padding:"10px 12px", textAlign:"center" }}>
-                        <div style={{ fontSize:22, fontWeight:800, color:"#f472b6", fontFamily:"'Instrument Serif',serif" }}>{THREATS.filter(t=>t.origin==="ENDPOINT").length}</div>
-                        <div style={{ fontSize:10, color:"#475569", marginTop:2 }}>Endpoint</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                {/* Right column */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-                {/* Activity */}
-                <div className="card" style={{ background:"#07101a", border:"1px solid #0f1e2e", borderRadius:14, padding:20 }}>
-                  <div style={{ fontSize:13, fontWeight:600, color:"#e2e8f0", marginBottom:16 }}>Activity Log</div>
-                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                    {ACTIVITY.map((a,i)=>{
-                      const dc = a.type==="critical"?"#ef4444":a.type==="ai"?"#a78bfa":a.type==="warn"?"#f97316":a.type==="resolved"?"#22c55e":"#38bdf8";
+                  {/* Severity breakdown */}
+                  <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px" }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 18 }}>By severity</div>
+                    {[
+                      { label: "Critical", key: "CRITICAL", color: C.critical },
+                      { label: "High",     key: "HIGH",     color: C.high },
+                      { label: "Medium",   key: "MEDIUM",   color: C.medium },
+                      { label: "Low",      key: "LOW",      color: C.low },
+                    ].map((b) => {
+                      const count = threats.filter(t => t.severity === b.key).length;
+                      const pct   = threats.length > 0 ? (count / threats.length) * 100 : 0;
                       return (
-                        <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
-                          <span style={{ fontSize:11, color:"#1e3352", minWidth:36, marginTop:1 }}>{a.time}</span>
-                          <div style={{ width:6, height:6, borderRadius:"50%", background:dc, flexShrink:0, marginTop:5 }}/>
-                          <span style={{ fontSize:12, color:"#475569", lineHeight:1.5 }}>{a.msg}</span>
+                        <div key={b.key} style={{ marginBottom: 14 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                            <span style={{ fontSize: 12, color: C.text2 }}>{b.label}</span>
+                            <span style={{ fontSize: 12, color: b.color, fontWeight: 700 }}>{count}</span>
+                          </div>
+                          <SevBar pct={pct} color={b.color} />
                         </div>
                       );
                     })}
                   </div>
-                </div>
 
-                {/* Endpoint health */}
-                <div className="card" style={{ background:"#07101a", border:"1px solid #0f1e2e", borderRadius:14, padding:20 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-                    <div style={{ fontSize:13, fontWeight:600, color:"#e2e8f0" }}>Endpoint Health</div>
-                    <button onClick={()=>setTab("endpoints")} style={{ background:"none", border:"1px solid #1e3352", borderRadius:6, padding:"4px 12px", color:"#60a5fa", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>Manage →</button>
+                  {/* Source status */}
+                  <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+                    <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}` }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>Data sources</span>
+                    </div>
+                    {SOURCES.map((s, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", borderBottom: i < SOURCES.length - 1 ? `1px solid ${C.border}` : "none" }}>
+                        <Dot color={C.low} size={6} />
+                        <span style={{ fontSize: 12, color: C.text2, flex: 1 }}>{s.name}</span>
+                        <span style={{ fontSize: 12, color: C.text3 }}>{s.lastSync || "--"}</span>
+                      </div>
+                    ))}
                   </div>
-                  {ENDPOINTS.map((ep,i)=>{
-                    const sc = ep.status==="INCIDENT"?"#ef4444":ep.status==="WARNING"?"#f97316":"#22c55e";
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══ THREATS ══ */}
+          {tab === "threats" && (
+            <div className="fade-up" style={{ padding: "32px 40px" }}>
+
+              {/* Filters */}
+              <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 24, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {["ALL", "CRITICAL", "HIGH", "MEDIUM", "LOW"].map(f => (
+                    <button key={f} onClick={() => setSevFilter(f)} style={{
+                      padding: "6px 14px", borderRadius: 7, border: `1px solid ${sevFilter === f ? (SEV_COLOR[f] || C.accent) : C.border}`,
+                      background: sevFilter === f ? (SEV_COLOR[f] || C.accent) + "18" : "transparent",
+                      color: sevFilter === f ? (SEV_COLOR[f] || C.accent) : C.text3,
+                      fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
+                    }}>{f}</button>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {["ALL", "GLOBAL", "ENDPOINT"].map(f => (
+                    <button key={f} onClick={() => setOriginFilter(f)} style={{
+                      padding: "6px 14px", borderRadius: 7, border: `1px solid ${originFilter === f ? C.accent : C.border}`,
+                      background: originFilter === f ? C.accent + "18" : "transparent",
+                      color: originFilter === f ? C.accent : C.text3,
+                      fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.15s",
+                    }}>{f}</button>
+                  ))}
+                </div>
+                <div style={{ marginLeft: "auto" }}>
+                  <input
+                    value={search} onChange={e => setSearch(e.target.value)}
+                    placeholder="Search CVE or title…"
+                    style={{
+                      background: C.surface, border: `1px solid ${C.border}`,
+                      borderRadius: 8, padding: "8px 14px", color: C.text,
+                      fontSize: 13, width: 260, fontFamily: "inherit",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Threat list */}
+              {filteredThreats.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "64px 0", color: C.text3, fontSize: 13 }}>
+                  {threats.length === 0
+                    ? "Syncing from NVD, OTX and AbuseIPDB — threats appear shortly."
+                    : "No threats match your current filters."}
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  {filteredThreats.map(t => {
+                    const sev       = t.severity || "MEDIUM";
+                    const color     = SEV_COLOR[sev] || C.accent;
+                    const score     = Math.round(t.priority_score ?? 0);
+                    const mitre     = parseMitre(t.mitre_tags);
+                    const isOpen    = expanded === t.id;
                     return (
-                      <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"9px 0", borderBottom:i<ENDPOINTS.length-1?"1px solid #0f1e2e":"none" }}>
-                        <PulseDot color={sc} size={7}/>
-                        <div style={{ flex:1 }}>
-                          <div style={{ fontSize:13, color:"#cbd5e1", fontWeight:500 }}>{ep.name}</div>
-                          <div style={{ fontSize:11, color:"#334155" }}>{ep.os} · {ep.ip}</div>
+                      <div key={t.id} style={{ borderRadius: isOpen ? "12px 12px 0 0" : 12, overflow: "hidden" }}>
+                        <div
+                          className="threat-row"
+                          onClick={() => setExpanded(isOpen ? null : t.id)}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 14,
+                            padding: "16px 20px",
+                            background: isOpen ? C.raised : C.surface,
+                            border: `1px solid ${isOpen ? C.borderHi : C.border}`,
+                            borderLeft: `3px solid ${color}`,
+                            borderBottom: isOpen ? "none" : undefined,
+                            opacity: t.resolved ? 0.4 : 1,
+                          }}
+                        >
+                          {/* Score */}
+                          <div style={{ width: 36, textAlign: "center", flexShrink: 0 }}>
+                            <div style={{ fontSize: 16, fontWeight: 800, color, lineHeight: 1 }}>{score}</div>
+                            <div style={{ fontSize: 10, color: C.text3, marginTop: 2 }}>score</div>
+                          </div>
+
+                          {/* Content */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 5, flexWrap: "wrap" }}>
+                              {t.cve && <span style={{ fontSize: 12, color: C.accent, fontWeight: 700 }}>{t.cve}</span>}
+                              <Chip label={sev}    color={color} />
+                              <Chip label={t.origin === "ENDPOINT" ? "ENDPOINT" : "GLOBAL"} color={t.origin === "ENDPOINT" ? "#ec4899" : C.accent} />
+                              {t.asset_match && <Chip label="Asset match" color={C.low} />}
+                              {t.resolved    && <Chip label="Resolved"    color={C.low} />}
+                              <span style={{ fontSize: 11, color: C.text3, marginLeft: "auto" }}>
+                                {t.created_at?.slice(0, 10) || "—"}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: 14, color: C.text, fontWeight: 500, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {t.title}
+                            </div>
+                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                              <span style={{ fontSize: 11, color: C.text3 }}>{t.source || "—"}</span>
+                              {mitre.slice(0, 3).map((m, mi) => (
+                                <span key={mi} style={{ fontSize: 11, color: C.text3, background: C.raised, borderRadius: 4, padding: "1px 7px" }}>{m}</span>
+                              ))}
+                              {t.epss_score > 0 && (
+                                <span style={{ fontSize: 11, color: C.text3, marginLeft: "auto" }}>
+                                  EPSS {(t.epss_score * 100).toFixed(0)}%
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill={C.text3} style={{ flexShrink: 0, transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                            <path d="M7 10l5 5 5-5z" />
+                          </svg>
                         </div>
-                        {ep.incidents>0 && <Badge label={`${ep.incidents} incident${ep.incidents>1?"s":""}`} color="#ef4444"/>}
-                        <Badge label={ep.status} color={sc}/>
+
+                        {/* Expanded detail */}
+                        {isOpen && (
+                          <div className="fade-up" style={{
+                            background: C.bg, border: `1px solid ${C.borderHi}`,
+                            borderTop: "none", borderRadius: "0 0 12px 12px",
+                            padding: "20px 20px 24px 20px",
+                          }}>
+                            <div style={{ fontSize: 12, color: "#8b5cf6", fontWeight: 600, letterSpacing: "0.5px", marginBottom: 10 }}>AI SUMMARY</div>
+                            <p style={{ fontSize: 13, color: C.text2, lineHeight: 1.8, marginBottom: 20 }}>
+                              {t.ai_summary || "AI summary not yet generated for this threat."}
+                            </p>
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                              <button onClick={() => window.electronAPI?.notify("ThreatLens — Escalation", t.title || "Threat escalated")} style={{
+                                background: C.critical + "14", border: `1px solid ${C.critical}30`,
+                                color: C.critical, padding: "8px 16px", borderRadius: 8,
+                                fontSize: 12, fontWeight: 500, cursor: "pointer",
+                              }}>Escalate</button>
+                              <button onClick={() => api.resolveThreat(t.id).then(() => qc.invalidateQueries(["threats"]))} style={{
+                                background: C.low + "14", border: `1px solid ${C.low}30`,
+                                color: C.low, padding: "8px 16px", borderRadius: 8,
+                                fontSize: 12, fontWeight: 500, cursor: "pointer",
+                              }}>Mark resolved</button>
+                              {t.cve && (
+                                <button onClick={() => window.open("https://nvd.nist.gov/vuln/detail/" + t.cve, "_blank")} style={{
+                                  background: C.accent + "14", border: `1px solid ${C.accent}30`,
+                                  color: C.accent, padding: "8px 16px", borderRadius: 8,
+                                  fontSize: 12, fontWeight: 500, cursor: "pointer",
+                                }}>View in NVD →</button>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* ══ GLOBAL THREATS ══ */}
-          {tab==="threats" && (
-            <div className="fade-up" style={{ padding:28 }}>
-              <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:20, flexWrap:"wrap" }}>
-                <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                  {["ALL","CRITICAL","HIGH","MEDIUM","LOW"].map(f=>(
-                    <button key={f} className="chip" onClick={()=>setSevFilter(f)} style={{
-                      border:`1px solid ${sevFilter===f?(SEV[f]||"#2563eb"):"#0f1e2e"}`,
-                      background:sevFilter===f?(SEVBG[f]||"rgba(37,99,235,0.1)"):"transparent",
-                      color:sevFilter===f?(SEV[f]||"#60a5fa"):"#334155",
-                      padding:"6px 14px", borderRadius:7, fontSize:12, fontWeight:600,
-                    }}>{f}</button>
-                  ))}
-                </div>
-                <div style={{ display:"flex", gap:6 }}>
-                  {["ALL","GLOBAL","ENDPOINT"].map(f=>(
-                    <button key={f} className="chip" onClick={()=>setOriginFilter(f)} style={{
-                      border:`1px solid ${originFilter===f?"#2563eb":"#0f1e2e"}`,
-                      background:originFilter===f?"rgba(37,99,235,0.1)":"transparent",
-                      color:originFilter===f?"#60a5fa":"#334155",
-                      padding:"6px 14px", borderRadius:7, fontSize:12, fontWeight:500,
-                    }}>{f}</button>
-                  ))}
-                </div>
-                <div style={{ marginLeft:"auto" }}>
-                  <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search CVE ID or title…"
-                    style={{ background:"#0c1825", border:"1px solid #0f1e2e", borderRadius:8, padding:"8px 14px", color:"#cbd5e1", fontSize:13, width:270, fontFamily:"inherit" }}/>
-                </div>
-              </div>
-
-              {filteredThreats.length === 0 && (
-                <div style={{ textAlign:"center", padding:"60px 0", color:"#334155", fontSize:14 }}>
-                  {THREATS.length === 0 ? "Syncing from NVD, OTX and AbuseIPDB — threats will appear shortly." : "No threats match your filters."}
-                </div>
               )}
-
-              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                {filteredThreats.map(t=>{
-                  const mitreTags = parseMitre(t.mitre_tags || t.mitre);
-                  const score     = Math.round(t.priority_score ?? t.score ?? 0);
-                  const sev       = t.severity || "MEDIUM";
-                  return (
-                    <div key={t.id}>
-                      <div className={`threat-row card${selected?.id===t.id?" sel":""}`}
-                        onClick={()=>setSelected(selected?.id===t.id?null:t)}
-                        style={{ background:"#07101a", border:`1px solid ${selected?.id===t.id?"#2563eb":"#0f1e2e"}`, borderRadius:12, padding:"16px 20px", opacity:t.resolved?0.45:1 }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-                          <ScoreRing score={score} color={SEV[sev]||"#ef4444"} size={50}/>
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ display:"flex", gap:8, marginBottom:7, alignItems:"center", flexWrap:"wrap" }}>
-                              <span style={{ fontSize:11, color:"#60a5fa", fontWeight:700 }}>{t.cve || "ENDPOINT EVENT"}</span>
-                              <Badge label={sev} color={SEV[sev]||"#ef4444"}/>
-                              <Badge label={t.origin==="ENDPOINT"?"ENDPOINT":"GLOBAL"} color={t.origin==="ENDPOINT"?"#f472b6":"#38bdf8"}/>
-                              {t.asset_match && <Badge label="ASSET MATCH" color="#22c55e"/>}
-                              {t.resolved    && <Badge label="RESOLVED" color="#22c55e"/>}
-                              {t.machine     && <Badge label={t.machine} color="#f472b6"/>}
-                              <span style={{ marginLeft:"auto", fontSize:11, color:"#334155" }}>{t.ts || t.created_at?.slice(11,16) || "--"}</span>
-                            </div>
-                            <div style={{ fontSize:15, fontWeight:600, color:"#e2e8f0", marginBottom:9 }}>{t.title}</div>
-                            <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                              <Badge label={t.source||"UNKNOWN"} color={SRC[t.source]||"#60a5fa"}/>
-                              {mitreTags.map((m,mi)=>(
-                                <Badge key={mi} label={`⚔ ${m}`} color={MCOL[mi]||"#38bdf8"}/>
-                              ))}
-                              {t.epss_score>0 && <span style={{ marginLeft:"auto", fontSize:11, color:"#334155" }}>EPSS {(t.epss_score*100).toFixed(0)}%</span>}
-                            </div>
-                          </div>
-                          <div style={{ color:"#1e3352", fontSize:20, transition:"transform 0.2s", transform:selected?.id===t.id?"rotate(90deg)":"none", flexShrink:0 }}>›</div>
-                        </div>
-                      </div>
-
-                      {selected?.id===t.id && (
-                        <div className="fade-up" style={{ background:"#040c16", border:"1px solid #0f1e2e", borderTop:"none", borderRadius:"0 0 12px 12px", padding:"20px 20px 22px" }}>
-                          <div style={{ display:"flex", gap:14 }}>
-                            <div style={{ width:36, height:36, background:"rgba(167,139,250,0.12)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🤖</div>
-                            <div style={{ flex:1 }}>
-                              <div style={{ fontSize:11, color:"#a78bfa", fontWeight:700, letterSpacing:"1px", marginBottom:10 }}>AI ANALYST SUMMARY</div>
-                              <p style={{ fontSize:13, color:"#64748b", lineHeight:1.8, marginBottom:16 }}>
-                                {t.ai_summary || t.summary || "AI summary not yet generated for this threat."}
-                              </p>
-                              <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                                <button onClick={()=>window.electronAPI?.notify("ThreatLens – Escalation","Threat escalated: "+(t.title||t.cve||"Unknown"))} style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#ef4444", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🚨 Escalate</button>
-                                <button onClick={()=>api.resolveThreat(t.id).then(()=>qc.invalidateQueries(["threats"]))}
-                                  style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>✓ Resolve</button>
-                                <button onClick={()=>t.cve&&window.open("https://nvd.nist.gov/vuln/detail/"+t.cve,"_blank")} style={{ background:"rgba(56,189,248,0.08)", border:"1px solid rgba(56,189,248,0.2)", color:"#38bdf8", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🔗 View in NVD</button>
-                                {t.origin==="ENDPOINT" && <button onClick={()=>alert("Sandbox analysis requires the endpoint agent to be running on the target machine.")} style={{ background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.2)", color:"#f472b6", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🖥 Sandbox Report</button>}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Knowledge graph */}
-              <div className="card" style={{ background:"#07101a", border:"1px solid #0f1e2e", borderRadius:14, padding:22, marginTop:20 }}>
-                <div style={{ fontSize:13, fontWeight:600, color:"#e2e8f0", marginBottom:4 }}>Threat Knowledge Graph</div>
-                <div style={{ fontSize:12, color:"#334155", marginBottom:16 }}>Relationships between threat actors, CVEs, campaigns, and MITRE tactics</div>
-                <div style={{ display:"flex", gap:12, marginBottom:14 }}>
-                  {[["#ef4444","Threat Actor"],["#f97316","CVE"],["#a78bfa","Campaign"],["#38bdf8","Tactic"]].map(([c,l])=>(
-                    <div key={l} style={{ display:"flex", alignItems:"center", gap:5 }}>
-                      <div style={{ width:8, height:8, borderRadius:"50%", background:c }}/>
-                      <span style={{ fontSize:11, color:"#475569" }}>{l}</span>
-                    </div>
-                  ))}
-                </div>
-                <svg viewBox="0 0 720 420" style={{ width:"100%", height:220, borderRadius:8, background:"#040c16" }}>
-                  {EDGES.map(([a,b],i)=>{
-                    const na=NODES.find(n=>n.id===a), nb=NODES.find(n=>n.id===b);
-                    return <line key={i} x1={na.x} y1={na.y} x2={nb.x} y2={nb.y} stroke="#0f1e2e" strokeWidth="1.5"/>;
-                  })}
-                  {NODES.map(n=>(
-                    <g key={n.id}>
-                      <circle cx={n.x} cy={n.y} r={n.type==="actor"?22:n.type==="campaign"?18:14} fill={`${n.color}15`} stroke={n.color} strokeWidth="1.5"/>
-                      <text x={n.x} y={n.y+1} textAnchor="middle" dominantBaseline="middle" fill={n.color} fontSize={n.type==="actor"?10:9} fontFamily="DM Sans,sans-serif" fontWeight="600">
-                        {n.label.length>12?n.label.slice(0,11)+"…":n.label}
-                      </text>
-                    </g>
-                  ))}
-                </svg>
-              </div>
             </div>
           )}
 
           {/* ══ ENDPOINTS ══ */}
-          {tab==="endpoints" && (
-            <div className="fade-up" style={{ padding:28 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:22 }}>
+          {tab === "endpoints" && (
+            <div className="fade-up" style={{ padding: "32px 40px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
                 {[
-                  { label:"Machines Online", val:ENDPOINTS.length,                                   color:"#38bdf8" },
-                  { label:"Active Incidents",val:ENDPOINTS.filter(e=>e.status==="INCIDENT").length,  color:"#ef4444" },
-                  { label:"Agent Coverage",  val:"100%",                                              color:"#22c55e" },
-                ].map((m,i)=>(
-                  <div key={i} className="card" style={{ background:"#07101a", border:`1px solid ${m.color}18`, borderRadius:12, padding:"18px 20px" }}>
-                    <div style={{ fontSize:11, color:m.color, fontWeight:600, letterSpacing:"0.3px", marginBottom:12 }}>{m.label}</div>
-                    <div style={{ fontSize:38, fontWeight:800, color:"#f8fafc", fontFamily:"'Instrument Serif',serif" }}>{m.val}</div>
+                  { label: "Machines online",   value: ENDPOINTS.length,                                         color: C.accent },
+                  { label: "Active incidents",   value: ENDPOINTS.filter(e => e.status === "INCIDENT").length,   color: C.critical },
+                  { label: "Agent coverage",     value: "100%",                                                   color: C.low },
+                ].map((m, i) => (
+                  <div key={i} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: "22px 24px" }}>
+                    <div style={{ fontSize: 12, color: C.text3, marginBottom: 12, fontWeight: 500 }}>{m.label}</div>
+                    <div style={{ fontSize: 36, fontWeight: 800, color: m.color, letterSpacing: "-0.5px" }}>{m.value}</div>
                   </div>
                 ))}
               </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                {ENDPOINTS.map((ep,i)=>{
-                  const sc=ep.status==="INCIDENT"?"#ef4444":ep.status==="WARNING"?"#f97316":"#22c55e";
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {ENDPOINTS.map((ep, i) => {
+                  const sc = ep.status === "INCIDENT" ? C.critical : ep.status === "WARNING" ? C.high : C.low;
                   return (
-                    <div key={i} className="ep-row card" style={{ background:"#07101a", border:`1px solid ${ep.status==="INCIDENT"?"rgba(239,68,68,0.2)":"#0f1e2e"}`, borderRadius:12, padding:"18px 22px" }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-                        <div style={{ width:44, height:44, background:`${sc}12`, border:`1px solid ${sc}25`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>💻</div>
-                        <div style={{ flex:1 }}>
-                          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
-                            <span style={{ fontSize:15, fontWeight:700, color:"#e2e8f0" }}>{ep.name}</span>
-                            <Badge label={ep.status} color={sc}/>
-                            {ep.incidents>0 && <Badge label={`${ep.incidents} incident${ep.incidents>1?"s":""}`} color="#ef4444"/>}
+                    <div key={i} style={{
+                      background: C.surface, border: `1px solid ${ep.status === "INCIDENT" ? C.critical + "30" : C.border}`,
+                      borderLeft: `3px solid ${sc}`, borderRadius: 12, padding: "18px 24px",
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{ep.name}</span>
+                            <Chip label={ep.status}   color={sc} />
+                            {ep.incidents > 0 && <Chip label={`${ep.incidents} incident${ep.incidents > 1 ? "s" : ""}`} color={C.critical} />}
                           </div>
-                          <div style={{ display:"flex", gap:16 }}>
-                            <span style={{ fontSize:12, color:"#475569" }}>{ep.os}</span>
-                            <span style={{ fontSize:12, color:"#334155" }}>{ep.ip}</span>
-                            <span style={{ fontSize:12, color:"#334155" }}>Agent {ep.agent}</span>
-                            <span style={{ fontSize:12, color:"#334155" }}>Last seen {ep.lastSeen}</span>
+                          <div style={{ display: "flex", gap: 16 }}>
+                            <span style={{ fontSize: 12, color: C.text2 }}>{ep.os}</span>
+                            <span style={{ fontSize: 12, color: C.text3 }}>{ep.ip}</span>
+                            <span style={{ fontSize: 12, color: C.text3 }}>Agent {ep.agent}</span>
+                            <span style={{ fontSize: 12, color: C.text3 }}>Last seen {ep.lastSeen}</span>
                           </div>
                         </div>
-                        <div style={{ display:"flex", gap:20, flexShrink:0 }}>
-                          {[["CPU",ep.cpu],["MEM",ep.mem]].map(([l,v])=>(
-                            <div key={l} style={{ textAlign:"center" }}>
-                              <div style={{ fontSize:11, color:"#334155", marginBottom:5 }}>{l}</div>
-                              <div style={{ fontSize:16, fontWeight:700, color:v>80?"#ef4444":v>60?"#f97316":"#22c55e" }}>{v}%</div>
+                        <div style={{ display: "flex", gap: 24, flexShrink: 0 }}>
+                          {[["CPU", ep.cpu], ["MEM", ep.mem]].map(([l, v]) => (
+                            <div key={l} style={{ textAlign: "center" }}>
+                              <div style={{ fontSize: 11, color: C.text3, marginBottom: 4 }}>{l}</div>
+                              <div style={{ fontSize: 16, fontWeight: 700, color: v > 80 ? C.critical : v > 60 ? C.high : C.low }}>{v}%</div>
                             </div>
                           ))}
                         </div>
                       </div>
-                      {ep.status==="INCIDENT" && (
-                        <div style={{ marginTop:14, paddingTop:14, borderTop:"1px solid #0f1e2e", display:"flex", gap:8 }}>
-                          <button onClick={()=>setTab("incidents")} style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#ef4444", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🔍 View Incidents</button>
-                          <button style={{ background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.2)", color:"#f472b6", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🧪 Open Sandbox</button>
-                          <button style={{ background:"rgba(248,113,113,0.08)", border:"1px solid rgba(248,113,113,0.2)", color:"#f87171", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🔌 Isolate Machine</button>
+                      {ep.status === "INCIDENT" && (
+                        <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}`, display: "flex", gap: 8 }}>
+                          <button onClick={() => setTab("incidents")} style={{ background: C.critical + "14", border: `1px solid ${C.critical}30`, color: C.critical, padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>View incidents</button>
+                          <button style={{ background: C.raised, border: `1px solid ${C.border}`, color: C.text3, padding: "7px 14px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>Isolate machine</button>
                         </div>
                       )}
                     </div>
@@ -773,59 +857,54 @@ export default function Dashboard() {
           )}
 
           {/* ══ INCIDENTS ══ */}
-          {tab==="incidents" && (
-            <div className="fade-up" style={{ padding:28 }}>
-              {incidents.length === 0 && THREATS.filter(t=>t.origin==="ENDPOINT").length === 0 ? (
-                <div style={{ textAlign:"center", padding:"60px 0", color:"#334155", fontSize:14 }}>
-                  No endpoint incidents detected yet. The agent will report here when it finds something.
+          {tab === "incidents" && (
+            <div className="fade-up" style={{ padding: "32px 40px" }}>
+              {incidents.length === 0 && threats.filter(t => t.origin === "ENDPOINT").length === 0 ? (
+                <div style={{ textAlign: "center", padding: "64px 0", color: C.text3, fontSize: 13 }}>
+                  No endpoint incidents detected. The agent will report here when it finds something.
                 </div>
               ) : (
-                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                  {(incidents.length > 0 ? incidents : THREATS.filter(t=>t.origin==="ENDPOINT")).map((t,i)=>{
-                    const mitreTags = parseMitre(t.mitre_tags || t.mitre);
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {(incidents.length > 0 ? incidents : threats.filter(t => t.origin === "ENDPOINT")).map((t, i) => {
+                    const mitre = parseMitre(t.mitre_tags);
                     return (
-                      <div key={i} className="card" style={{ background:"#07101a", border:`1px solid ${t.resolved?"#0f1e2e":"rgba(239,68,68,0.18)"}`, borderRadius:14, padding:22, opacity:t.resolved?0.5:1 }}>
-                        <div style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
-                          <div style={{ width:46, height:46, background:"rgba(239,68,68,0.1)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>
-                            {(t.title||"").includes("ansom")?"🔒":(t.title||"").includes("C2")?"🌐":"⚠️"}
-                          </div>
-                          <div style={{ flex:1 }}>
-                            <div style={{ display:"flex", gap:8, marginBottom:8, flexWrap:"wrap", alignItems:"center" }}>
-                              <span style={{ fontSize:15, fontWeight:700, color:"#f1f5f9" }}>{t.title}</span>
-                              <Badge label="ENDPOINT EVENT" color="#f472b6"/>
+                      <div key={i} style={{
+                        background: C.surface,
+                        border: `1px solid ${t.resolved ? C.border : C.critical + "28"}`,
+                        borderLeft: `3px solid ${t.resolved ? C.border : C.critical}`,
+                        borderRadius: 12, padding: "20px 24px",
+                        opacity: t.resolved ? 0.45 : 1,
+                      }}>
+                        <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap", alignItems: "center" }}>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{t.title}</span>
+                              {t.machine && <Chip label={t.machine} color="#ec4899" />}
                               {!t.resolved && (
-                                <div style={{ display:"flex", alignItems:"center", gap:6, marginLeft:"auto" }}>
-                                  <PulseDot color="#ef4444" size={7}/>
-                                  <span style={{ fontSize:11, color:"#ef4444", fontWeight:600 }}>ACTIVE</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
+                                  <Dot color={C.critical} pulse size={6} />
+                                  <span style={{ fontSize: 11, color: C.critical, fontWeight: 600 }}>Active</span>
                                 </div>
                               )}
                             </div>
-                            <p style={{ fontSize:13, color:"#475569", lineHeight:1.7, marginBottom:14 }}>
-                              {t.ai_summary || t.summary || "Processing..."}
+                            <p style={{ fontSize: 13, color: C.text2, lineHeight: 1.7, marginBottom: 16 }}>
+                              {t.ai_summary || "Processing incident…"}
                             </p>
-                            {t.machine && (
-                              <div style={{ background:"#040c16", border:"1px solid #0f1e2e", borderRadius:10, padding:"14px 16px", marginBottom:14 }}>
-                                <div style={{ fontSize:11, color:"#334155", letterSpacing:"1px", marginBottom:10 }}>INCIDENT TIMELINE</div>
-                                {[
-                                  { time:"00:00", event:"Anomaly detected by endpoint monitor",             color:"#f97316" },
-                                  { time:"00:01", event:"File sent to VirusTotal for quick hash check",    color:"#a78bfa" },
-                                  { time:"00:02", event:"AI scoring and MITRE mapping completed",          color:"#38bdf8" },
-                                  { time:"00:03", event:"AI verdict determined — auto-response triggered", color:"#ef4444" },
-                                  { time:"00:04", event:"Process killed · File quarantined · Analyst notified", color:"#22c55e" },
-                                ].map((ev,ei)=>(
-                                  <div key={ei} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:ei<4?10:0 }}>
-                                    <span style={{ fontSize:11, color:"#334155", minWidth:40, marginTop:1 }}>+{ev.time}</span>
-                                    <div style={{ width:6, height:6, borderRadius:"50%", background:ev.color, flexShrink:0, marginTop:4 }}/>
-                                    <span style={{ fontSize:12, color:"#64748b" }}>{ev.event}</span>
-                                  </div>
+                            {mitre.length > 0 && (
+                              <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+                                {mitre.map((m, mi) => (
+                                  <span key={mi} style={{ fontSize: 11, color: C.text3, background: C.raised, borderRadius: 4, padding: "2px 8px" }}>{m}</span>
                                 ))}
                               </div>
                             )}
-                            <div style={{ display:"flex", gap:8 }}>
-                              <button onClick={()=>alert("Sandbox analysis requires the endpoint agent to be running on the target machine.")} style={{ background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.2)", color:"#f472b6", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🧪 Sandbox Report</button>
-                              <button onClick={()=>alert("Playbook: Isolate machine → Run AV scan → Patch CVE → Rotate credentials → Review logs.")} style={{ background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", color:"#a78bfa", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📋 Full Playbook</button>
-                              <button onClick={()=>api.resolveThreat(t.id).then(()=>qc.invalidateQueries(["incidents"]))}
-                                style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e", padding:"7px 14px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>✓ Mark Resolved</button>
+                            <SandboxButton filePath={t.raw_data} />
+                            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                              <button onClick={() => alert("Playbook: Isolate machine → Run AV scan → Patch CVE → Rotate credentials → Review logs.")} style={{ background: "#8b5cf614", border: "1px solid #8b5cf630", color: "#8b5cf6", padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
+                                View playbook
+                              </button>
+                              <button onClick={() => api.resolveThreat(t.id).then(() => qc.invalidateQueries(["incidents"]))} style={{ background: C.low + "14", border: `1px solid ${C.low}30`, color: C.low, padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
+                                Mark resolved
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -838,105 +917,107 @@ export default function Dashboard() {
           )}
 
           {/* ══ AI BRIEF ══ */}
-          {tab==="brief" && (
-            <div className="fade-up" style={{ padding:28, maxWidth:860 }}>
-              <div style={{ background:"#07101a", border:"1px solid #0f1e2e", borderRadius:14, overflow:"hidden" }}>
-                <div style={{ background:"linear-gradient(135deg,rgba(167,139,250,0.1) 0%,rgba(37,99,235,0.06) 100%)", borderBottom:"1px solid #0f1e2e", padding:"22px 28px", display:"flex", gap:16, alignItems:"center" }}>
-                  <div style={{ width:48, height:48, background:"rgba(167,139,250,0.12)", border:"1px solid rgba(167,139,250,0.2)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>🤖</div>
+          {tab === "brief" && (
+            <div className="fade-up" style={{ padding: "32px 40px", maxWidth: 800 }}>
+              <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+                {/* Header */}
+                <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
-                    <div style={{ fontSize:18, fontWeight:700, color:"#f1f5f9", letterSpacing:"-0.3px" }}>Morning Threat Brief</div>
-                    <div style={{ fontSize:12, color:"#475569", marginTop:3 }}>
-                      Generated by ThreatLens AI · {briefData.generated_at ? new Date(briefData.generated_at).toLocaleString() : "Loading..."}
+                    <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 4 }}>Morning Brief</div>
+                    <div style={{ fontSize: 12, color: C.text3 }}>
+                      {briefData.generated_at ? new Date(briefData.generated_at).toLocaleString() : "Generating…"}
                     </div>
                   </div>
-                  <div style={{ marginLeft:"auto" }}>
-                    <div style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:7, padding:"6px 12px", fontSize:12, color:"#22c55e" }}>✦ Fresh</div>
-                  </div>
+                  <Chip label="Fresh" color={C.low} />
                 </div>
 
-                <div style={{ display:"flex", borderBottom:"1px solid #0f1e2e", background:"#040c16" }}>
-                  {["Overview","Global Threats","Endpoint Incidents","Recommendations"].map((s,i)=>(
-                    <button key={i} className="chip" onClick={()=>setBriefSection(i)} style={{
-                      padding:"12px 20px", background:"none",
-                      color:briefSection===i?"#a78bfa":"#334155",
-                      borderBottom:briefSection===i?"2px solid #a78bfa":"2px solid transparent",
-                      fontSize:13, fontWeight:briefSection===i?600:400,
-                      borderTop:"none", borderLeft:"none", borderRight:"none", borderRadius:0, fontFamily:"inherit"
+                {/* Tabs */}
+                <div style={{ display: "flex", borderBottom: `1px solid ${C.border}` }}>
+                  {["Overview", "Global threats", "Endpoint incidents", "Recommendations"].map((s, i) => (
+                    <button key={i} onClick={() => setBriefTab(i)} style={{
+                      padding: "12px 20px", background: "none", border: "none",
+                      borderBottom: briefTab === i ? `2px solid ${C.accent}` : "2px solid transparent",
+                      color: briefTab === i ? C.text : C.text3,
+                      fontSize: 13, fontWeight: briefTab === i ? 600 : 400, cursor: "pointer",
+                      marginBottom: -1, transition: "color 0.15s",
                     }}>{s}</button>
                   ))}
                 </div>
 
-                <div style={{ padding:28 }}>
-                  {briefSection===0 && (
+                {/* Content */}
+                <div style={{ padding: 28 }}>
+                  {briefTab === 0 && (
                     <div>
-                      <p style={{ fontSize:13, color:"#64748b", lineHeight:1.9, marginBottom:22 }}>
-                        {briefData.brief
-                          ? briefData.brief.slice(0, 400) + "..."
-                          : "Brief is being generated. Run the backend and ensure OpenAI API key is configured."}
+                      <p style={{ fontSize: 14, color: C.text2, lineHeight: 1.9 }}>
+                        {briefData.brief || "Brief is being generated. Ensure the backend is running and your OpenAI API key is set in Settings → AI."}
                       </p>
-                      {briefData.brief && (
-                        <div style={{ background:"#040c16", border:"1px solid #0f1e2e", borderRadius:10, padding:20 }}>
-                          <div style={{ fontSize:11, color:"#334155", letterSpacing:"1px", marginBottom:12 }}>FULL AI BRIEF</div>
-                          <p style={{ fontSize:13, color:"#64748b", lineHeight:1.9, whiteSpace:"pre-wrap" }}>{briefData.brief}</p>
-                        </div>
-                      )}
                     </div>
                   )}
-                  {briefSection===1 && (
+
+                  {briefTab === 1 && (
                     <div>
-                      <p style={{ fontSize:13, color:"#64748b", lineHeight:1.9, marginBottom:20 }}>
-                        {THREATS.filter(t=>t.origin==="GLOBAL").length} global CVEs ingested. Sorted by ThreatLens priority score.
+                      <p style={{ fontSize: 13, color: C.text3, marginBottom: 20 }}>
+                        {threats.filter(t => t.origin === "GLOBAL").length} global CVEs ingested · sorted by priority score
                       </p>
-                      {THREATS.filter(t=>t.origin==="GLOBAL").slice(0,5).map((t,i)=>{
-                        const score = Math.round(t.priority_score ?? t.score ?? 0);
+                      {threats.filter(t => t.origin === "GLOBAL").slice(0, 5).map((t, i) => {
+                        const sev = t.severity || "MEDIUM";
                         return (
-                          <div key={i} style={{ display:"flex", gap:14, padding:"14px 0", borderBottom:i<4?"1px solid #0f1e2e":"none", alignItems:"flex-start" }}>
-                            <ScoreRing score={score} color={SEV[t.severity]||"#ef4444"} size={44}/>
+                          <div key={i} style={{ display: "flex", gap: 16, padding: "16px 0", borderBottom: i < 4 ? `1px solid ${C.border}` : "none" }}>
+                            <div style={{ width: 4, background: SEV_COLOR[sev] || C.accent, borderRadius: 2, flexShrink: 0 }} />
                             <div>
-                              <div style={{ display:"flex", gap:7, marginBottom:6, flexWrap:"wrap" }}>
-                                <span style={{ fontSize:11, color:"#60a5fa", fontWeight:700 }}>{t.cve}</span>
-                                <Badge label={t.severity} color={SEV[t.severity]||"#ef4444"}/>
-                                {t.asset_match && <Badge label="YOUR STACK" color="#22c55e"/>}
+                              <div style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "center" }}>
+                                {t.cve && <span style={{ fontSize: 12, color: C.accent, fontWeight: 700 }}>{t.cve}</span>}
+                                <Chip label={sev} color={SEV_COLOR[sev] || C.accent} />
                               </div>
-                              <div style={{ fontSize:14, fontWeight:600, color:"#e2e8f0", marginBottom:6 }}>{t.title}</div>
-                              <p style={{ fontSize:13, color:"#64748b", lineHeight:1.7 }}>{t.ai_summary || t.summary || "Processing..."}</p>
+                              <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 6 }}>{t.title}</div>
+                              <p style={{ fontSize: 13, color: C.text2, lineHeight: 1.7 }}>{t.ai_summary || "Processing…"}</p>
                             </div>
                           </div>
                         );
                       })}
                     </div>
                   )}
-                  {briefSection===2 && (
+
+                  {briefTab === 2 && (
                     <div>
-                      <p style={{ fontSize:13, color:"#64748b", lineHeight:1.9, marginBottom:20 }}>
-                        {incidents.length || THREATS.filter(t=>t.origin==="ENDPOINT").length} endpoint incidents detected. Review and clear after forensics.
+                      <p style={{ fontSize: 13, color: C.text3, marginBottom: 20 }}>
+                        {incidents.length || threats.filter(t => t.origin === "ENDPOINT").length} endpoint incidents — review and clear after forensics
                       </p>
-                      {(incidents.length > 0 ? incidents : THREATS.filter(t=>t.origin==="ENDPOINT")).map((t,i)=>(
-                        <div key={i} style={{ padding:"16px", background:"#040c16", borderRadius:10, border:"1px solid rgba(239,68,68,0.15)", marginBottom:14 }}>
-                          <div style={{ display:"flex", gap:8, marginBottom:8, alignItems:"center" }}>
-                            {t.machine && <Badge label={t.machine} color="#f472b6"/>}
-                            <Badge label="AUTO-RESPONDED" color="#22c55e"/>
-                            <span style={{ fontSize:11, color:"#334155", marginLeft:"auto" }}>{t.ts || t.created_at?.slice(11,16) || "--"}</span>
+                      {(incidents.length > 0 ? incidents : threats.filter(t => t.origin === "ENDPOINT")).map((t, i) => (
+                        <div key={i} style={{ padding: 16, background: C.raised, borderRadius: 10, border: `1px solid ${C.border}`, marginBottom: 12 }}>
+                          <div style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
+                            {t.machine && <Chip label={t.machine} color="#ec4899" />}
+                            <span style={{ fontSize: 11, color: C.text3, marginLeft: "auto" }}>{t.created_at?.slice(0, 10) || "—"}</span>
                           </div>
-                          <div style={{ fontSize:14, fontWeight:600, color:"#e2e8f0", marginBottom:7 }}>{t.title}</div>
-                          <p style={{ fontSize:13, color:"#64748b", lineHeight:1.7 }}>{t.ai_summary || t.summary || "Processing..."}</p>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 6 }}>{t.title}</div>
+                          <p style={{ fontSize: 13, color: C.text2, lineHeight: 1.7 }}>{t.ai_summary || "Processing…"}</p>
                         </div>
                       ))}
                     </div>
                   )}
-                  {briefSection===3 && (
+
+                  {briefTab === 3 && (
                     <div>
-                      {["Immediate (Today)","Short-term (This Week)","Ongoing"].map((phase,pi)=>(
-                        <div key={pi} style={{ marginBottom:22 }}>
-                          <div style={{ fontSize:12, color:"#334155", letterSpacing:"1px", fontWeight:600, marginBottom:12 }}>{phase.toUpperCase()}</div>
-                          {[
-                            ["Patch all CRITICAL CVEs matching your asset profile","Isolate any machines with active endpoint incidents","Rotate credentials on affected systems"],
-                            ["Review EPSS scores for all HIGH severity CVEs","Run full endpoint scan with updated YARA signatures","Audit CI/CD pipeline access logs"],
-                            ["Schedule weekly EPSS score reviews","Enable real-time Slack alerts for CRITICAL incidents","Keep asset inventory up to date with software versions"],
-                          ][pi].map((rec,ri)=>(
-                            <div key={ri} style={{ display:"flex", gap:10, marginBottom:10, alignItems:"flex-start" }}>
-                              <span style={{ color:"#22c55e", fontSize:14, marginTop:1 }}>›</span>
-                              <span style={{ fontSize:13, color:"#64748b", lineHeight:1.6 }}>{rec}</span>
+                      {[
+                        {
+                          phase: "Immediate — today",
+                          items: ["Patch all CRITICAL CVEs matching your asset profile", "Isolate any machines with active endpoint incidents", "Rotate credentials on affected systems"],
+                        },
+                        {
+                          phase: "This week",
+                          items: ["Review EPSS scores for all HIGH severity CVEs", "Run full endpoint scan with updated YARA signatures", "Audit CI/CD pipeline access logs"],
+                        },
+                        {
+                          phase: "Ongoing",
+                          items: ["Schedule weekly EPSS score reviews", "Enable real-time alerts for CRITICAL incidents", "Keep asset inventory updated with software versions"],
+                        },
+                      ].map((section, si) => (
+                        <div key={si} style={{ marginBottom: 24 }}>
+                          <div style={{ fontSize: 11, color: C.text3, fontWeight: 600, letterSpacing: "0.8px", textTransform: "uppercase", marginBottom: 12 }}>{section.phase}</div>
+                          {section.items.map((item, ii) => (
+                            <div key={ii} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
+                              <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.accent, flexShrink: 0, marginTop: 7 }} />
+                              <span style={{ fontSize: 13, color: C.text2, lineHeight: 1.6 }}>{item}</span>
                             </div>
                           ))}
                         </div>
@@ -945,52 +1026,46 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                <div style={{ padding:"14px 28px 20px", borderTop:"1px solid #0f1e2e", display:"flex", gap:8 }}>
-                  <button onClick={()=>navigator.clipboard.writeText(briefData?.brief||"No brief available")} style={{ background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", color:"#a78bfa", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📋 Copy Brief</button>
-                  <button onClick={()=>alert("PDF export: copy the brief text and paste into your preferred editor.")} style={{ background:"rgba(56,189,248,0.08)", border:"1px solid rgba(56,189,248,0.2)", color:"#38bdf8", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📤 Export PDF</button>
-                  <button onClick={()=>navigator.clipboard.writeText(briefData?.brief||"").then(()=>alert("Brief copied — paste it into your team chat or email."))} style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)", color:"#22c55e", padding:"8px 16px", borderRadius:7, fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>📨 Send to Team</button>
+                {/* Footer actions */}
+                <div style={{ padding: "16px 28px", borderTop: `1px solid ${C.border}`, display: "flex", gap: 8 }}>
+                  <button onClick={() => navigator.clipboard.writeText(briefData?.brief || "No brief available")} style={{ background: C.raised, border: `1px solid ${C.border}`, color: C.text3, padding: "8px 16px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>
+                    Copy brief
+                  </button>
+                  <button onClick={() => navigator.clipboard.writeText(briefData?.brief || "").then(() => alert("Copied — paste into team chat or email."))} style={{ background: C.raised, border: `1px solid ${C.border}`, color: C.text3, padding: "8px 16px", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>
+                    Share with team
+                  </button>
                 </div>
               </div>
             </div>
           )}
 
           {/* ══ DATA SOURCES ══ */}
-          {tab==="sources" && (
-            <div className="fade-up" style={{ padding:28 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
-                {SOURCES.map((s,i)=>(
-                  <div key={i} className="card" style={{ background:"#07101a", border:"1px solid #0f1e2e", borderRadius:14, padding:22 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
-                      <div style={{ width:44, height:44, background:`${s.color}12`, border:`1px solid ${s.color}25`, borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>{s.icon}</div>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontSize:14, fontWeight:600, color:"#e2e8f0" }}>{s.name}</div>
-                        <div style={{ fontSize:11, color:"#334155", marginTop:2, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{s.url}</div>
-                      </div>
-                      <PulseDot color="#22c55e" size={7}/>
+          {tab === "sources" && (
+            <div className="fade-up" style={{ padding: "32px 40px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+                {SOURCES.map((s, i) => (
+                  <div key={i} style={{ background: C.surface, border: `1px solid ${C.border}`, borderLeft: `3px solid ${s.color || C.accent}`, borderRadius: 12, padding: "20px 22px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: C.text }}>{s.name}</span>
+                      <Dot color={C.low} size={7} />
                     </div>
-                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:14 }}>
-                      {[["Today",s.count],["Matched",s.matched],["Interval",s.interval]].map(([l,v])=>(
-                        <div key={l} style={{ background:"#040c16", borderRadius:8, padding:"9px 10px" }}>
-                          <div style={{ fontSize:10, color:"#334155", marginBottom:4 }}>{l}</div>
-                          <div style={{ fontSize:13, color:s.color, fontWeight:700 }}>{v}</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}>
+                      {[["Today", s.count], ["Matched", s.matched], ["Every", s.interval]].map(([l, v]) => (
+                        <div key={l} style={{ background: C.raised, borderRadius: 8, padding: "10px 12px" }}>
+                          <div style={{ fontSize: 10, color: C.text3, marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>{l}</div>
+                          <div style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{v}</div>
                         </div>
                       ))}
                     </div>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                      <span style={{ fontSize:11, color:"#334155" }}>Last sync: {s.lastSync}</span>
-                      <Badge label="ACTIVE" color="#22c55e"/>
-                    </div>
+                    <div style={{ fontSize: 11, color: C.text3 }}>Last sync: {s.lastSync || "—"}</div>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-
           {/* ══ SETTINGS ══ */}
-          {tab==="settings" && (
-            <SettingsPanel />
-          )}
+          {tab === "settings" && <Settings />}
 
         </main>
       </div>

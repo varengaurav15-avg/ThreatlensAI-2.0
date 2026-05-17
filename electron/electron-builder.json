@@ -1,0 +1,48 @@
+{
+  "appId": "com.threatlens.ai",
+  "productName": "ThreatLens AI",
+  "copyright": "Copyright 2025 ThreatLens AI",
+  "forceCodeSigning": false,
+  "directories": {
+    "output": "../dist-installers",
+    "buildResources": "assets"
+  },
+  "files": [
+    "main.js",
+    "preload.js",
+    "assets/**"
+  ],
+  "extraResources": [
+    {
+      "from": "../backend/dist/main",
+      "to": "backend",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "../frontend/dist",
+      "to": "frontend-dist",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "assets/icon.ico",
+    "verifyUpdateCodeSignature": false,
+    "requestedExecutionLevel": "asInvoker"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "allowElevation": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "ThreatLens AI",
+    "runAfterFinish": true,
+    "perMachine": false
+  }
+}

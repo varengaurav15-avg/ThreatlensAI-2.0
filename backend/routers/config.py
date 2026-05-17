@@ -46,3 +46,34 @@ def _write_env(key: str, value: str):
         new_lines.append(f"{key}={value}\n")
     with open(ENV_PATH, "w") as f:
         f.writelines(new_lines)
+
+_API_KEYS = [
+    "NVD_API_KEY", "OTX_API_KEY", "ABUSEIPDB_API_KEY",
+    "VIRUSTOTAL_API_KEY", "HYBRID_ANALYSIS_API_KEY", "OPENAI_API_KEY",
+]
+
+@router.get("/keys")
+async def get_api_keys():
+    """Return all managed API keys (masked for display)."""
+    keys = {}
+    for k in _API_KEYS:
+        val = os.getenv(k, "")
+        keys[k] = val
+    return keys
+
+from fastapi import BackgroundTasks
+
+@router.post("/keys")
+async def save_api_keys(payload: dict, bg_tasks: BackgroundTasks):
+    """Write API keys to .env and hot-load into os.environ."""
+    for k in _API_KEYS:
+        if k in payload:
+            val = payload[k].strip()
+            _write_env(k, val)
+            os.environ[k] = val
+            
+    # Trigger an immediate poll so data starts flowing instantly
+    from scheduler import full_ingestion_cycle
+    bg_tasks.add_task(full_ingestion_cycle)
+    
+    return {"status": "saved"}

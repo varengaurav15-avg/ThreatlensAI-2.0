@@ -5,8 +5,27 @@ const fs     = require('fs')
 const http   = require('http')
 
 let mainWindow, tray, backendProcess
+let windowCreated  = false   // guard — createWindow runs exactly once
+let backendHealthy = false   // guard — only open window after backend confirms ready
 
 const IS_DEV = !app.isPackaged
+
+// ── SINGLE INSTANCE LOCK ─────────────────────────────────────
+const gotLock = app.requestSingleInstanceLock()
+if (!gotLock) {
+  // A second instance tried to open — quit it immediately
+  app.quit()
+  process.exit(0)
+}
+
+// If a second instance fires anyway, just focus the existing window
+app.on('second-instance', () => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore()
+    mainWindow.show()
+    mainWindow.focus()
+  }
+})
 
 // ── BACKEND STARTUP ──────────────────────────────────────────
 function startBackend() {
@@ -20,7 +39,7 @@ function startBackend() {
     backendArgs = [path.join(__dirname, '../backend/main.py')]
     backendCwd  = path.join(__dirname, '../backend')
   } else {
-    backendExe  = path.join(process.resourcesPath, 'backend', 'main.exe')
+    backendExe = path.join(process.resourcesPath, 'backend', 'main.exe')
     backendArgs = []
     backendCwd  = path.join(process.resourcesPath, 'backend')
   }
@@ -34,51 +53,63 @@ function startBackend() {
     return
   }
 
-  // Copy .env from resources into the backend CWD so dotenv finds it
-  if (!IS_DEV) {
-    const envSrc = path.join(process.resourcesPath, 'backend', '.env')
-    const envDst = path.join(backendCwd, '.env')
-    if (fs.existsSync(envSrc) && !fs.existsSync(envDst)) {
-      try { fs.copyFileSync(envSrc, envDst) } catch(e) { /* ignore */ }
-    }
-  }
-
   backendProcess = spawn(backendExe, backendArgs, {
     cwd: backendCwd,
     windowsHide: true,
-    env: { ...process.env }
+    env: { ...process.env },
   })
 
-  backendProcess.stdout.on('data', d => console.log(`[backend] ${d}`))
-  backendProcess.stderr.on('data', d => console.error(`[backend-err] ${d}`))
-  backendProcess.on('error', err => console.error('Failed to start backend:', err))
-  backendProcess.on('exit', code => console.log(`Backend exited: ${code}`))
+  backendProcess.stdout?.on('data', d => console.log(`[backend] ${d}`))
+  backendProcess.stderr?.on('data', d => console.error(`[backend-err] ${d}`))
+  backendProcess.on('error', err => console.error('Backend spawn error:', err))
+  backendProcess.on('exit', code => console.log(`Backend exited with code ${code}`))
 }
 
-// ── WAIT FOR BACKEND HEALTH ───────────────────────────────────
-// Poll /health until it responds (up to 30 s) before opening the window.
-// Beats a fixed 2 s delay — backend can be slow on first boot.
-function waitForBackend(callback, attempts = 0) {
-  const MAX = 60  // 60 × 500 ms = 30 s
-  if (attempts >= MAX) {
-    console.warn('Backend did not respond in 30 s — opening window anyway')
-    callback()
-    return
-  }
-  const req = http.get('http://127.0.0.1:8000/health', res => {
-    if (res.statusCode === 200) {
-      console.log('Backend ready ✓')
+// ── WAIT FOR BACKEND ─────────────────────────────────────────
+// Polls /health every 500 ms. Calls callback exactly once when ready.
+function waitForBackend(callback) {
+  let done = false   // ensures callback fires at most once
+
+  function attempt(tries) {
+    if (done) return
+    if (tries >= 60) {
+      console.warn('Backend did not respond after 30 s — opening window anyway')
+      done = true
       callback()
-    } else {
-      setTimeout(() => waitForBackend(callback, attempts + 1), 500)
+      return
     }
-  })
-  req.on('error', () => setTimeout(() => waitForBackend(callback, attempts + 1), 500))
-  req.setTimeout(400, () => { req.destroy(); setTimeout(() => waitForBackend(callback, attempts + 1), 500) })
+
+    const req = http.get('http://127.0.0.1:8000/health', (res) => {
+      if (done) return
+      if (res.statusCode === 200) {
+        console.log('Backend healthy ✓')
+        done = true
+        callback()
+      } else {
+        setTimeout(() => attempt(tries + 1), 500)
+      }
+      // Consume response body so the socket is released
+      res.resume()
+    })
+
+    req.on('error', () => {
+      if (!done) setTimeout(() => attempt(tries + 1), 500)
+    })
+
+    req.setTimeout(400, () => {
+      req.destroy()
+      if (!done) setTimeout(() => attempt(tries + 1), 500)
+    })
+  }
+
+  attempt(0)
 }
 
 // ── WINDOW CREATION ──────────────────────────────────────────
 function createWindow() {
+  if (windowCreated) return   // never open more than one window
+  windowCreated = true
+
   mainWindow = new BrowserWindow({
     width: 1280, height: 800,
     minWidth: 1024, minHeight: 700,
@@ -86,7 +117,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
     },
     backgroundColor: '#060c14',
     show: false,
@@ -102,7 +133,7 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => mainWindow.show())
 
-  // Tray icon
+  // System tray
   const trayIconPath = path.join(__dirname, 'assets', 'tray-icon.png')
   try {
     const { nativeImage } = require('electron')
@@ -113,7 +144,7 @@ function createWindow() {
       tray.setContextMenu(Menu.buildFromTemplate([
         { label: 'Open ThreatLens', click: () => { mainWindow.show(); mainWindow.focus() } },
         { type: 'separator' },
-        { label: 'Quit', click: () => app.quit() }
+        { label: 'Quit', click: () => app.quit() },
       ]))
       tray.on('double-click', () => { mainWindow.show(); mainWindow.focus() })
     }
@@ -134,10 +165,14 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   app.isQuitting = true
-  if (backendProcess) backendProcess.kill()
+  if (backendProcess) {
+    try { backendProcess.kill() } catch (_) {}
+  }
 })
 
-app.on('activate', () => { if (mainWindow) mainWindow.show() })
+app.on('activate', () => {
+  if (mainWindow) mainWindow.show()
+})
 
 // ── IPC ──────────────────────────────────────────────────────
 ipcMain.on('show-notification', (_, { title, body }) => {

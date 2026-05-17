@@ -13,8 +13,7 @@ hiddenimports = []
 # ── Third-party packages with dynamic imports ─────────────────
 for pkg in ['fastapi', 'uvicorn', 'starlette', 'sqlalchemy', 'aiosqlite',
             'python_socketio', 'python_engineio', 'apscheduler',
-            'langchain', 'langchain_core', 'langchain_openai',
-            'openai', 'httpx', 'pydantic', 'anyio', 'sniffio',
+            'httpx', 'pydantic', 'anyio', 'sniffio',
             'dotenv', 'python_dotenv']:
     try:
         d, b, h = collect_all(pkg)
@@ -29,9 +28,10 @@ for pkg in ['fastapi', 'uvicorn', 'starlette', 'sqlalchemy', 'aiosqlite',
 LOCAL_PKGS = [
     '_paths',
     'database',
-    'models', 'models.threat', 'models.endpoint',
+    'models', 'models.threat', 'models.endpoint', 'models.user',
     'routers', 'routers.threats', 'routers.incidents',
     'routers.brief', 'routers.config', 'routers.sources',
+    'routers.auth', 'routers.otx_proxy',
     'scheduler',
     'services', 'services.llm', 'services.mitre', 'services.scoring',
     'services.virustotal',
@@ -40,6 +40,9 @@ LOCAL_PKGS = [
     'services.ingestion.rss',
     'services.agents', 'services.agents.analyst', 'services.agents.context',
     'services.agents.correlator', 'services.agents.hunter', 'services.agents.pipeline',
+    'services.agents.endpoint_stats', 'services.agents.file_watcher',
+    'services.sandbox',
+    'routers.endpoints', 'routers.sandbox',
 ]
 hiddenimports += LOCAL_PKGS
 

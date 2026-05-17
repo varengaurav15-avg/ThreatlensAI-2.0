@@ -1,0 +1,611 @@
+2026-05-16 14:43:28 INFO main: Backend starting up
+2026-05-16 14:54:01 INFO main: Backend starting up
+2026-05-16 14:54:01 INFO main: ENV loaded from C:\Users\varen\Desktop\threatlens-ai\backend\.env (exists=True)
+2026-05-16 14:54:22 INFO uvicorn.error: Started server process [35184]
+2026-05-16 14:54:22 INFO uvicorn.error: Waiting for application startup.
+2026-05-16 14:54:23 INFO database: Database ready at C:\Users\varen\Desktop\threatlens-ai\backend\threatlens.db
+2026-05-16 14:54:23 INFO apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-05-16 14:54:23 INFO apscheduler.scheduler: Added job "full_ingestion_cycle" to job store "default"
+2026-05-16 14:54:23 INFO apscheduler.scheduler: Scheduler started
+2026-05-16 14:54:23 INFO scheduler: Scheduler started — first poll in 5 s
+2026-05-16 14:54:23 INFO file_watcher: File watcher thread started — folders: ['C:\\Users\\varen\\Desktop\\ThreatLens-Sandbox', 'C:\\Users\\varen\\Downloads']
+2026-05-16 14:54:23 INFO main: Watching folders: ['C:\\Users\\varen\\Desktop\\ThreatLens-Sandbox', 'C:\\Users\\varen\\Downloads']
+2026-05-16 14:54:23 INFO main: ThreatLens backend ready
+2026-05-16 14:54:23 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Antigravity.exe
+2026-05-16 14:54:23 INFO uvicorn.error: Application startup complete.
+2026-05-16 14:54:23 WARNING apscheduler.executors.default: Run time of job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 14:54:28 IST)" was missed by 0:14:55.018206
+2026-05-16 14:54:23 INFO uvicorn.error: Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+2026-05-16 14:54:24 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:24 INFO file_watcher: Incident posted: Antigravity.exe (.exe)
+2026-05-16 14:54:24 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Claude Setup.exe
+2026-05-16 14:54:24 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:24 INFO file_watcher: Incident posted: Claude Setup.exe (.exe)
+2026-05-16 14:54:24 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\CursorUserSetup-x64-2.5.25.exe
+2026-05-16 14:54:24 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:24 INFO file_watcher: Incident posted: CursorUserSetup-x64-2.5.25.exe (.exe)
+2026-05-16 14:54:24 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\EAAntiCheat.Installer.exe
+2026-05-16 14:54:24 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:24 INFO file_watcher: Incident posted: EAAntiCheat.Installer.exe (.exe)
+2026-05-16 14:54:24 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Git-2.54.0-64-bit.exe
+2026-05-16 14:54:25 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:25 INFO file_watcher: Incident posted: Git-2.54.0-64-bit.exe (.exe)
+2026-05-16 14:54:25 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\IBM-BobUserSetup-x64-1.109.5+bob1.0.2.exe
+2026-05-16 14:54:25 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:25 INFO file_watcher: Incident posted: IBM-BobUserSetup-x64-1.109.5+bob1.0.2.exe (.exe)
+2026-05-16 14:54:25 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\neo4j-desktop-2.1.3-x64.exe
+2026-05-16 14:54:25 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:25 INFO file_watcher: Incident posted: neo4j-desktop-2.1.3-x64.exe (.exe)
+2026-05-16 14:54:25 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\node-v24.14.1-x64.msi
+2026-05-16 14:54:25 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:25 INFO file_watcher: Incident posted: node-v24.14.1-x64.msi (.msi)
+2026-05-16 14:54:25 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\ThreatLens AI Setup 1.0.0.exe
+2026-05-16 14:54:26 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:26 INFO file_watcher: Incident posted: ThreatLens AI Setup 1.0.0.exe (.exe)
+2026-05-16 14:54:26 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\UrbanVPN.exe
+2026-05-16 14:54:28 INFO apscheduler.executors.default: Running job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 15:09:28 IST)" (scheduled at 2026-05-16 14:54:28.006508+05:30)
+2026-05-16 14:54:28 INFO scheduler: === Full ingestion cycle starting ===
+2026-05-16 14:54:28 INFO scheduler: Polling NVD...
+2026-05-16 14:54:28 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:54:28 INFO file_watcher: Incident posted: UrbanVPN.exe (.exe)
+2026-05-16 14:54:30 INFO nvd: Calling NVD API (last 24h)
+2026-05-16 14:54:34 INFO httpx: HTTP Request: GET https://services.nvd.nist.gov/rest/json/cves/2.0?pubStartDate=2026-05-15T09%3A24%3A28.000&pubEndDate=2026-05-16T09%3A24%3A28.000&resultsPerPage=50 "HTTP/1.1 200 OK"
+2026-05-16 14:54:34 INFO nvd: NVD response: 200
+2026-05-16 14:54:34 INFO nvd: NVD parsed 50 CVEs
+2026-05-16 14:54:36 INFO httpx: HTTP Request: GET https://api.first.org/data/v1/epss?cve=CVE-2026-41960,CVE-2026-41961,CVE-2026-41962,CVE-2026-41963,CVE-2026-41964,CVE-2026-41965,CVE-2026-41966,CVE-2026-41967,CVE-2026-41968,CVE-2026-41969,CVE-2026-41970,CVE-2026-41971,CVE-2026-8454,CVE-2026-8503,CVE-2026-41552,CVE-2026-41553,CVE-2026-7182,CVE-2026-46333,CVE-2025-14972,CVE-2025-67437,CVE-2026-34253,CVE-2026-38728,CVE-2026-39052,CVE-2026-39053,CVE-2026-39054,CVE-2026-45736,CVE-2026-46483,CVE-2026-8669,CVE-2026-2031,CVE-2026-35194,CVE-2026-45772,CVE-2026-45773,CVE-2026-45803,CVE-2026-46508,CVE-2026-23695,CVE-2026-41181,CVE-2026-41258,CVE-2026-42155,CVE-2026-42207,CVE-2026-42458,CVE-2026-44309,CVE-2026-44310,CVE-2026-44641,CVE-2026-44699,CVE-2026-44714,CVE-2026-44717,CVE-2026-44774,CVE-2026-45035,CVE-2026-45036,CVE-2026-45037 "HTTP/1.1 200 OK"
+2026-05-16 14:54:36 INFO database: upsert_threats: saved 50 rows
+2026-05-16 14:54:36 INFO scheduler: NVD: saved 50 / 50 threats to DB
+2026-05-16 14:54:36 INFO scheduler: Polling OTX...
+2026-05-16 14:54:44 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 14:54:51 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/activity "HTTP/1.1 200 OK"
+2026-05-16 14:54:51 INFO otx: OTX activity: HTTP 200
+2026-05-16 14:54:51 INFO otx: OTX fetched 10 pulses
+2026-05-16 14:54:51 INFO database: upsert_threats: saved 10 rows
+2026-05-16 14:54:51 INFO scheduler: OTX: saved 10 / 10 threats to DB
+2026-05-16 14:54:51 INFO scheduler: Polling AbuseIPDB...
+2026-05-16 14:54:53 INFO httpx: HTTP Request: GET https://api.abuseipdb.com/api/v2/blacklist?confidenceMinimum=75&limit=50 "HTTP/1.1 200 OK"
+2026-05-16 14:54:53 INFO abuseipdb: AbuseIPDB response: HTTP 200
+2026-05-16 14:54:53 INFO abuseipdb: AbuseIPDB returned 50 IP threats
+2026-05-16 14:54:53 INFO database: upsert_threats: saved 50 rows
+2026-05-16 14:54:53 INFO scheduler: AbuseIPDB: saved 50 / 50 threats to DB
+2026-05-16 14:54:53 INFO scheduler: Polling RSS feeds...
+2026-05-16 14:54:55 INFO httpx: HTTP Request: GET https://krebsonsecurity.com/feed/ "HTTP/1.1 200 OK"
+2026-05-16 14:54:55 INFO httpx: HTTP Request: GET https://www.bleepingcomputer.com/feed/ "HTTP/1.1 200 OK"
+2026-05-16 14:54:57 INFO httpx: HTTP Request: GET https://feeds.feedburner.com/TheHackersNews "HTTP/1.1 200 OK"
+2026-05-16 14:54:59 INFO httpx: HTTP Request: GET https://www.darkreading.com/rss.xml "HTTP/1.1 200 OK"
+2026-05-16 14:54:59 INFO database: upsert_threats: saved 20 rows
+2026-05-16 14:54:59 INFO scheduler: RSS: saved 20 / 20 threats to DB
+2026-05-16 14:54:59 INFO scheduler: === Full ingestion cycle complete ===
+2026-05-16 14:54:59 INFO apscheduler.executors.default: Job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 15:09:28 IST)" executed successfully
+2026-05-16 14:55:17 INFO routers.auth: SMTP not configured - verify link for varengaurav1504@gmail.com: http://localhost:8000/auth/verify/8087d0a3-2066-4a40-88d9-49be52dd08b4
+2026-05-16 14:56:37 INFO routers.auth: SMTP not configured - verify link for varengaurav15@gmail.com: http://localhost:8000/auth/verify/b586f49c-1f85-4fd5-8d1d-2e52cc4e45d0
+2026-05-16 14:56:55 INFO routers.auth: SMTP not configured - verify link for gauravvaren15@gmail.com: http://localhost:8000/auth/verify/39f6afb1-5efb-4552-a03b-d1684d5e5fc7
+2026-05-16 14:57:03 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 14:59:07 INFO uvicorn.error: Shutting down
+2026-05-16 14:59:07 INFO uvicorn.error: Waiting for application shutdown.
+2026-05-16 14:59:07 INFO main: Backend shutting down
+2026-05-16 14:59:07 INFO uvicorn.error: Application shutdown complete.
+2026-05-16 14:59:07 INFO uvicorn.error: Finished server process [35184]
+2026-05-16 14:59:11 INFO main: Backend starting up
+2026-05-16 14:59:11 INFO main: ENV loaded from C:\Users\varen\Desktop\threatlens-ai\backend\.env (exists=True)
+2026-05-16 14:59:12 INFO uvicorn.error: Started server process [3620]
+2026-05-16 14:59:12 INFO uvicorn.error: Waiting for application startup.
+2026-05-16 14:59:12 INFO database: Database ready at C:\Users\varen\Desktop\threatlens-ai\backend\threatlens.db
+2026-05-16 14:59:12 INFO apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-05-16 14:59:12 INFO apscheduler.scheduler: Added job "full_ingestion_cycle" to job store "default"
+2026-05-16 14:59:12 INFO apscheduler.scheduler: Scheduler started
+2026-05-16 14:59:12 INFO scheduler: Scheduler started — first poll in 5 s
+2026-05-16 14:59:12 INFO file_watcher: File watcher thread started — folders: ['C:\\Users\\varen\\Desktop\\ThreatLens-Sandbox', 'C:\\Users\\varen\\Downloads']
+2026-05-16 14:59:12 INFO main: Watching folders: ['C:\\Users\\varen\\Desktop\\ThreatLens-Sandbox', 'C:\\Users\\varen\\Downloads']
+2026-05-16 14:59:12 INFO main: ThreatLens backend ready
+2026-05-16 14:59:12 INFO uvicorn.error: Application startup complete.
+2026-05-16 14:59:12 WARNING apscheduler.executors.default: Run time of job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 14:59:17 IST)" was missed by 0:14:55.002999
+2026-05-16 14:59:12 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Antigravity.exe
+2026-05-16 14:59:12 INFO uvicorn.error: Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+2026-05-16 14:59:12 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:12 INFO file_watcher: Incident posted: Antigravity.exe (.exe)
+2026-05-16 14:59:12 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Claude Setup.exe
+2026-05-16 14:59:12 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:12 INFO file_watcher: Incident posted: Claude Setup.exe (.exe)
+2026-05-16 14:59:12 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\CursorUserSetup-x64-2.5.25.exe
+2026-05-16 14:59:13 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:13 INFO file_watcher: Incident posted: CursorUserSetup-x64-2.5.25.exe (.exe)
+2026-05-16 14:59:13 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\EAAntiCheat.Installer.exe
+2026-05-16 14:59:13 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:13 INFO file_watcher: Incident posted: EAAntiCheat.Installer.exe (.exe)
+2026-05-16 14:59:13 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Git-2.54.0-64-bit.exe
+2026-05-16 14:59:13 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:13 INFO file_watcher: Incident posted: Git-2.54.0-64-bit.exe (.exe)
+2026-05-16 14:59:13 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\IBM-BobUserSetup-x64-1.109.5+bob1.0.2.exe
+2026-05-16 14:59:13 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:13 INFO file_watcher: Incident posted: IBM-BobUserSetup-x64-1.109.5+bob1.0.2.exe (.exe)
+2026-05-16 14:59:13 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\neo4j-desktop-2.1.3-x64.exe
+2026-05-16 14:59:14 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:14 INFO file_watcher: Incident posted: neo4j-desktop-2.1.3-x64.exe (.exe)
+2026-05-16 14:59:14 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\node-v24.14.1-x64.msi
+2026-05-16 14:59:14 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:14 INFO file_watcher: Incident posted: node-v24.14.1-x64.msi (.msi)
+2026-05-16 14:59:14 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\ThreatLens AI Setup 1.0.0.exe
+2026-05-16 14:59:14 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:14 INFO file_watcher: Incident posted: ThreatLens AI Setup 1.0.0.exe (.exe)
+2026-05-16 14:59:14 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\UrbanVPN.exe
+2026-05-16 14:59:14 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 14:59:14 INFO file_watcher: Incident posted: UrbanVPN.exe (.exe)
+2026-05-16 14:59:17 INFO apscheduler.executors.default: Running job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 15:14:17 IST)" (scheduled at 2026-05-16 14:59:17.594496+05:30)
+2026-05-16 14:59:17 INFO scheduler: === Full ingestion cycle starting ===
+2026-05-16 14:59:17 INFO scheduler: Polling NVD...
+2026-05-16 14:59:19 INFO nvd: Calling NVD API (last 24h)
+2026-05-16 14:59:21 INFO httpx: HTTP Request: GET https://services.nvd.nist.gov/rest/json/cves/2.0?pubStartDate=2026-05-15T09%3A29%3A17.000&pubEndDate=2026-05-16T09%3A29%3A17.000&resultsPerPage=50 "HTTP/1.1 200 OK"
+2026-05-16 14:59:21 INFO nvd: NVD response: 200
+2026-05-16 14:59:21 INFO nvd: NVD parsed 50 CVEs
+2026-05-16 14:59:21 INFO httpx: HTTP Request: GET https://api.first.org/data/v1/epss?cve=CVE-2026-41960,CVE-2026-41961,CVE-2026-41962,CVE-2026-41963,CVE-2026-41964,CVE-2026-41965,CVE-2026-41966,CVE-2026-41967,CVE-2026-41968,CVE-2026-41969,CVE-2026-41970,CVE-2026-41971,CVE-2026-8454,CVE-2026-8503,CVE-2026-41552,CVE-2026-41553,CVE-2026-7182,CVE-2026-46333,CVE-2025-14972,CVE-2025-67437,CVE-2026-34253,CVE-2026-38728,CVE-2026-39052,CVE-2026-39053,CVE-2026-39054,CVE-2026-45736,CVE-2026-46483,CVE-2026-8669,CVE-2026-2031,CVE-2026-35194,CVE-2026-45772,CVE-2026-45773,CVE-2026-45803,CVE-2026-46508,CVE-2026-23695,CVE-2026-41181,CVE-2026-41258,CVE-2026-42155,CVE-2026-42207,CVE-2026-42458,CVE-2026-44309,CVE-2026-44310,CVE-2026-44641,CVE-2026-44699,CVE-2026-44714,CVE-2026-44717,CVE-2026-44774,CVE-2026-45035,CVE-2026-45036,CVE-2026-45037 "HTTP/1.1 200 OK"
+2026-05-16 14:59:21 INFO database: upsert_threats: saved 50 rows
+2026-05-16 14:59:21 INFO scheduler: NVD: saved 50 / 50 threats to DB
+2026-05-16 14:59:21 INFO scheduler: Polling OTX...
+2026-05-16 14:59:29 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 14:59:36 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/activity "HTTP/1.1 200 OK"
+2026-05-16 14:59:36 INFO otx: OTX activity: HTTP 200
+2026-05-16 14:59:36 INFO otx: OTX fetched 10 pulses
+2026-05-16 14:59:36 INFO database: upsert_threats: saved 10 rows
+2026-05-16 14:59:36 INFO scheduler: OTX: saved 10 / 10 threats to DB
+2026-05-16 14:59:36 INFO scheduler: Polling AbuseIPDB...
+2026-05-16 14:59:39 INFO httpx: HTTP Request: GET https://api.abuseipdb.com/api/v2/blacklist?confidenceMinimum=75&limit=50 "HTTP/1.1 200 OK"
+2026-05-16 14:59:39 INFO abuseipdb: AbuseIPDB response: HTTP 200
+2026-05-16 14:59:39 INFO abuseipdb: AbuseIPDB returned 50 IP threats
+2026-05-16 14:59:39 INFO database: upsert_threats: saved 50 rows
+2026-05-16 14:59:39 INFO scheduler: AbuseIPDB: saved 50 / 50 threats to DB
+2026-05-16 14:59:39 INFO scheduler: Polling RSS feeds...
+2026-05-16 14:59:40 INFO httpx: HTTP Request: GET https://krebsonsecurity.com/feed/ "HTTP/1.1 200 OK"
+2026-05-16 14:59:41 INFO httpx: HTTP Request: GET https://www.bleepingcomputer.com/feed/ "HTTP/1.1 200 OK"
+2026-05-16 14:59:43 INFO httpx: HTTP Request: GET https://feeds.feedburner.com/TheHackersNews "HTTP/1.1 200 OK"
+2026-05-16 14:59:46 INFO httpx: HTTP Request: GET https://www.darkreading.com/rss.xml "HTTP/1.1 200 OK"
+2026-05-16 14:59:46 INFO database: upsert_threats: saved 20 rows
+2026-05-16 14:59:46 INFO scheduler: RSS: saved 20 / 20 threats to DB
+2026-05-16 14:59:46 INFO scheduler: === Full ingestion cycle complete ===
+2026-05-16 14:59:46 INFO apscheduler.executors.default: Job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 15:14:17 IST)" executed successfully
+2026-05-16 14:59:57 INFO routers.auth: Verify link for varengaurav15@gmail.com: http://localhost:8000/auth/verify/cbf18bf7-5288-4835-995c-73d6e51a81ba
+2026-05-16 15:00:38 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:00:40 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:00:40 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:02:04 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:02:09 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:02:19 ERROR uvicorn.error: Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection.py", line 103, in handle_async_request
+    return await self._connection.handle_async_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 136, in handle_async_request
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 106, in handle_async_request
+    ) = await self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 177, in _receive_response_headers
+    event = await self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 217, in _receive_event
+    data = await self._network_stream.read(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_backends\anyio.py", line 32, in read
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\uvicorn\protocols\http\httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\uvicorn\middleware\proxy_headers.py", line 56, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\engineio\async_drivers\asgi.py", line 75, in __call__
+    await self.other_asgi_app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\cors.py", line 96, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\cors.py", line 154, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\Desktop\threatlens-ai\backend\routers\otx_proxy.py", line 13, in otx_pulses
+    r = await client.get(
+        ^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1768, in get
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout
+2026-05-16 15:03:42 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:03:43 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:07:05 INFO uvicorn.error: Shutting down
+2026-05-16 15:07:06 INFO uvicorn.error: Waiting for application shutdown.
+2026-05-16 15:07:06 INFO main: Backend shutting down
+2026-05-16 15:07:06 INFO uvicorn.error: Application shutdown complete.
+2026-05-16 15:07:06 INFO uvicorn.error: Finished server process [3620]
+2026-05-16 15:07:08 INFO main: Backend starting up
+2026-05-16 15:07:08 INFO main: ENV loaded from C:\Users\varen\Desktop\threatlens-ai\backend\.env (exists=True)
+2026-05-16 15:07:09 INFO uvicorn.error: Started server process [32140]
+2026-05-16 15:07:09 INFO uvicorn.error: Waiting for application startup.
+2026-05-16 15:07:09 INFO database: Database ready at C:\Users\varen\Desktop\threatlens-ai\backend\threatlens.db
+2026-05-16 15:07:09 INFO apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-05-16 15:07:09 INFO apscheduler.scheduler: Added job "full_ingestion_cycle" to job store "default"
+2026-05-16 15:07:09 INFO apscheduler.scheduler: Scheduler started
+2026-05-16 15:07:09 INFO scheduler: Scheduler started — first poll in 5 s
+2026-05-16 15:07:09 INFO file_watcher: File watcher thread started — folders: ['C:\\Users\\varen\\Desktop\\ThreatLens-Sandbox', 'C:\\Users\\varen\\Downloads']
+2026-05-16 15:07:09 INFO main: Watching folders: ['C:\\Users\\varen\\Desktop\\ThreatLens-Sandbox', 'C:\\Users\\varen\\Downloads']
+2026-05-16 15:07:09 INFO main: ThreatLens backend ready
+2026-05-16 15:07:09 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Antigravity.exe
+2026-05-16 15:07:09 INFO uvicorn.error: Application startup complete.
+2026-05-16 15:07:09 WARNING apscheduler.executors.default: Run time of job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 15:07:14 IST)" was missed by 0:14:55.003434
+2026-05-16 15:07:09 INFO uvicorn.error: Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+2026-05-16 15:07:09 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:09 INFO file_watcher: Incident posted: Antigravity.exe (.exe)
+2026-05-16 15:07:09 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Claude Setup.exe
+2026-05-16 15:07:10 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:10 INFO file_watcher: Incident posted: Claude Setup.exe (.exe)
+2026-05-16 15:07:10 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\CursorUserSetup-x64-2.5.25.exe
+2026-05-16 15:07:10 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:10 INFO file_watcher: Incident posted: CursorUserSetup-x64-2.5.25.exe (.exe)
+2026-05-16 15:07:10 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\EAAntiCheat.Installer.exe
+2026-05-16 15:07:10 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:10 INFO file_watcher: Incident posted: EAAntiCheat.Installer.exe (.exe)
+2026-05-16 15:07:10 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\Git-2.54.0-64-bit.exe
+2026-05-16 15:07:10 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:10 INFO file_watcher: Incident posted: Git-2.54.0-64-bit.exe (.exe)
+2026-05-16 15:07:10 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\IBM-BobUserSetup-x64-1.109.5+bob1.0.2.exe
+2026-05-16 15:07:10 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:10 INFO file_watcher: Incident posted: IBM-BobUserSetup-x64-1.109.5+bob1.0.2.exe (.exe)
+2026-05-16 15:07:10 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\neo4j-desktop-2.1.3-x64.exe
+2026-05-16 15:07:11 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:11 INFO file_watcher: Incident posted: neo4j-desktop-2.1.3-x64.exe (.exe)
+2026-05-16 15:07:11 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\node-v24.14.1-x64.msi
+2026-05-16 15:07:11 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:11 INFO file_watcher: Incident posted: node-v24.14.1-x64.msi (.msi)
+2026-05-16 15:07:11 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\ThreatLens AI Setup 1.0.0.exe
+2026-05-16 15:07:11 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:11 INFO file_watcher: Incident posted: ThreatLens AI Setup 1.0.0.exe (.exe)
+2026-05-16 15:07:11 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\UrbanVPN.exe
+2026-05-16 15:07:12 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:07:12 INFO file_watcher: Incident posted: UrbanVPN.exe (.exe)
+2026-05-16 15:07:14 INFO apscheduler.executors.default: Running job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 15:22:14 IST)" (scheduled at 2026-05-16 15:07:14.675612+05:30)
+2026-05-16 15:07:14 INFO scheduler: === Full ingestion cycle starting ===
+2026-05-16 15:07:14 INFO scheduler: Polling NVD...
+2026-05-16 15:07:16 INFO nvd: Calling NVD API (last 24h)
+2026-05-16 15:07:21 INFO httpx: HTTP Request: GET https://services.nvd.nist.gov/rest/json/cves/2.0?pubStartDate=2026-05-15T09%3A37%3A14.000&pubEndDate=2026-05-16T09%3A37%3A14.000&resultsPerPage=50 "HTTP/1.1 200 OK"
+2026-05-16 15:07:21 INFO nvd: NVD response: 200
+2026-05-16 15:07:21 INFO nvd: NVD parsed 50 CVEs
+2026-05-16 15:07:22 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:07:22 INFO httpx: HTTP Request: GET https://api.first.org/data/v1/epss?cve=CVE-2026-41960,CVE-2026-41961,CVE-2026-41962,CVE-2026-41963,CVE-2026-41964,CVE-2026-41965,CVE-2026-41966,CVE-2026-41967,CVE-2026-41968,CVE-2026-41969,CVE-2026-41970,CVE-2026-41971,CVE-2026-8454,CVE-2026-8503,CVE-2026-41552,CVE-2026-41553,CVE-2026-7182,CVE-2026-46333,CVE-2025-14972,CVE-2025-67437,CVE-2026-34253,CVE-2026-38728,CVE-2026-39052,CVE-2026-39053,CVE-2026-39054,CVE-2026-45736,CVE-2026-46483,CVE-2026-8669,CVE-2026-2031,CVE-2026-35194,CVE-2026-45772,CVE-2026-45773,CVE-2026-45803,CVE-2026-46508,CVE-2026-23695,CVE-2026-41181,CVE-2026-41258,CVE-2026-42155,CVE-2026-42207,CVE-2026-42458,CVE-2026-44309,CVE-2026-44310,CVE-2026-44641,CVE-2026-44699,CVE-2026-44714,CVE-2026-44717,CVE-2026-44774,CVE-2026-45035,CVE-2026-45036,CVE-2026-45037 "HTTP/1.1 200 OK"
+2026-05-16 15:07:22 INFO database: upsert_threats: saved 50 rows
+2026-05-16 15:07:22 INFO scheduler: NVD: saved 50 / 50 threats to DB
+2026-05-16 15:07:22 INFO scheduler: Polling OTX...
+2026-05-16 15:07:37 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/activity "HTTP/1.1 200 OK"
+2026-05-16 15:07:37 INFO otx: OTX activity: HTTP 200
+2026-05-16 15:07:37 INFO otx: OTX fetched 10 pulses
+2026-05-16 15:07:37 INFO database: upsert_threats: saved 10 rows
+2026-05-16 15:07:37 INFO scheduler: OTX: saved 10 / 10 threats to DB
+2026-05-16 15:07:37 INFO scheduler: Polling AbuseIPDB...
+2026-05-16 15:07:40 INFO httpx: HTTP Request: GET https://api.abuseipdb.com/api/v2/blacklist?confidenceMinimum=75&limit=50 "HTTP/1.1 200 OK"
+2026-05-16 15:07:40 INFO abuseipdb: AbuseIPDB response: HTTP 200
+2026-05-16 15:07:40 INFO abuseipdb: AbuseIPDB returned 50 IP threats
+2026-05-16 15:07:41 INFO database: upsert_threats: saved 50 rows
+2026-05-16 15:07:41 INFO scheduler: AbuseIPDB: saved 50 / 50 threats to DB
+2026-05-16 15:07:41 INFO scheduler: Polling RSS feeds...
+2026-05-16 15:07:44 INFO httpx: HTTP Request: GET https://krebsonsecurity.com/feed/ "HTTP/1.1 200 OK"
+2026-05-16 15:07:45 INFO httpx: HTTP Request: GET https://www.bleepingcomputer.com/feed/ "HTTP/1.1 200 OK"
+2026-05-16 15:07:47 INFO httpx: HTTP Request: GET https://feeds.feedburner.com/TheHackersNews "HTTP/1.1 200 OK"
+2026-05-16 15:07:48 INFO httpx: HTTP Request: GET https://www.darkreading.com/rss.xml "HTTP/1.1 200 OK"
+2026-05-16 15:07:48 INFO database: upsert_threats: saved 20 rows
+2026-05-16 15:07:48 INFO scheduler: RSS: saved 20 / 20 threats to DB
+2026-05-16 15:07:48 INFO scheduler: === Full ingestion cycle complete ===
+2026-05-16 15:07:48 INFO apscheduler.executors.default: Job "full_ingestion_cycle (trigger: interval[0:15:00], next run at: 2026-05-16 15:22:14 IST)" executed successfully
+2026-05-16 15:09:32 ERROR uvicorn.error: Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection.py", line 103, in handle_async_request
+    return await self._connection.handle_async_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 136, in handle_async_request
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 106, in handle_async_request
+    ) = await self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 177, in _receive_response_headers
+    event = await self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 217, in _receive_event
+    data = await self._network_stream.read(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_backends\anyio.py", line 32, in read
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\uvicorn\protocols\http\httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\uvicorn\middleware\proxy_headers.py", line 56, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\engineio\async_drivers\asgi.py", line 75, in __call__
+    await self.other_asgi_app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\cors.py", line 96, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\cors.py", line 154, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\Desktop\threatlens-ai\backend\routers\otx_proxy.py", line 13, in otx_pulses
+    r = await client.get(
+        ^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1768, in get
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout
+2026-05-16 15:09:32 WARNING file_watcher: Suspicious new file: C:\Users\varen\Downloads\ThreatLens AI Setup 1.0.0 (1).exe
+2026-05-16 15:09:33 INFO httpx: HTTP Request: POST http://127.0.0.1:8000/api/incidents/ingest "HTTP/1.1 200 OK"
+2026-05-16 15:09:33 INFO file_watcher: Incident posted: ThreatLens AI Setup 1.0.0 (1).exe (.exe)
+2026-05-16 15:10:02 INFO httpx: HTTP Request: GET https://otx.alienvault.com/api/v1/pulses/subscribed?limit=20&page=1 "HTTP/1.1 200 OK"
+2026-05-16 15:16:31 ERROR uvicorn.error: Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\connection.py", line 103, in handle_async_request
+    return await self._connection.handle_async_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 136, in handle_async_request
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 106, in handle_async_request
+    ) = await self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 177, in _receive_response_headers
+    event = await self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_async\http11.py", line 217, in _receive_event
+    data = await self._network_stream.read(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_backends\anyio.py", line 32, in read
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\uvicorn\protocols\http\httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\uvicorn\middleware\proxy_headers.py", line 56, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\engineio\async_drivers\asgi.py", line 75, in __call__
+    await self.other_asgi_app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\cors.py", line 96, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\cors.py", line 154, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\Desktop\threatlens-ai\backend\routers\otx_proxy.py", line 13, in otx_pulses
+    r = await client.get(
+        ^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1768, in get
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 393, in handle_async_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\varen\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout
+2026-05-16 15:19:12 INFO uvicorn.error: Shutting down
+2026-05-16 15:19:12 INFO uvicorn.error: Waiting for application shutdown.
+2026-05-16 15:19:12 INFO main: Backend shutting down
+2026-05-16 15:19:12 INFO uvicorn.error: Application shutdown complete.
+2026-05-16 15:19:12 INFO uvicorn.error: Finished server process [32140]

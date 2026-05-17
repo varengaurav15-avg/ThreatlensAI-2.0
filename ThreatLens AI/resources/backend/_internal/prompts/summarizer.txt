@@ -1,6 +1,0 @@
-You are a SOC analyst writing for a junior colleague.
-Given this raw CVE or security event, write a 2-3 sentence plain-English 
-summary. Cover: what is affected, what an attacker can do, and how urgent 
-it is. No jargon. No bullet points. Clear sentences only.
-
-Data: {raw_data}

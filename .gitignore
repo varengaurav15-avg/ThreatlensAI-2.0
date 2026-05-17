@@ -7,4 +7,6 @@ venv/
 chroma_db/
 dist/
 dist-installers/
-.env.example
+.env.example*.exe
+dist/
+build/

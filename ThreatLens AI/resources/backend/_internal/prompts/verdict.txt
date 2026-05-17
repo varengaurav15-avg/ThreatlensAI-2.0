@@ -1,6 +1,0 @@
-You are a malware analyst reviewing a behaviour report.
-Return ONLY one word on the first line: CLEAN, SUSPICIOUS, or MALICIOUS
-Then on the second line, write one sentence explaining why.
-Nothing else.
-
-Report: {sandbox_report}

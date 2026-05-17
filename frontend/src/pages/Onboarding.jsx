@@ -42,7 +42,7 @@ export default function Onboarding({ onComplete }) {
   };
 
   const btnPrimary = {
-    background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
+    background: "linear-gradient(135deg, #b8922a, #ecc155)",
     border: "none", borderRadius: 10, padding: "12px 28px",
     color: "#fff", fontSize: 14, fontWeight: 600,
     cursor: "pointer", fontFamily: "inherit", width: "100%"
@@ -52,7 +52,7 @@ export default function Onboarding({ onComplete }) {
     background: "transparent",
     border: "1px solid #1e3352",
     borderRadius: 10, padding: "12px 28px",
-    color: "#64748b", fontSize: 14,
+    color: "#9a907d", fontSize: 14,
     cursor: "pointer", fontFamily: "inherit"
   };
 
@@ -62,7 +62,7 @@ export default function Onboarding({ onComplete }) {
         onClick={() => onChange(!checked)}
         style={{
           width: 44, height: 24, borderRadius: 12, cursor: "pointer",
-          background: checked ? "#2563eb" : "#1e3352",
+          background: checked ? "#ecc155" : "#283646",
           position: "relative", transition: "background 0.2s", flexShrink: 0
         }}
       >
@@ -78,12 +78,12 @@ export default function Onboarding({ onComplete }) {
   function Screen({ children }) {
     return (
       <div style={{
-        height: "100vh", background: "#060c14",
+        height: "100vh", background: "#061423",
         display: "flex", alignItems: "center", justifyContent: "center",
         fontFamily: "'DM Sans', system-ui, sans-serif"
       }}>
         <div style={{
-          width: 560, background: "#07101a",
+          width: 560, background: "#0f1c2c",
           border: "1px solid #0f1e2e", borderRadius: 20,
           padding: "48px", boxShadow: "0 32px 80px rgba(0,0,0,0.5)"
         }}>
@@ -92,7 +92,7 @@ export default function Onboarding({ onComplete }) {
             {STEPS.map((_, i) => (
               <div key={i} style={{
                 width: i === step ? 24 : 8, height: 8, borderRadius: 4,
-                background: i === step ? "#2563eb" : i < step ? "#1d4ed8" : "#1e3352",
+                background: i === step ? "#ecc155" : i < step ? "#b8922a" : "#283646",
                 transition: "all 0.3s"
               }} />
             ))}
@@ -116,16 +116,16 @@ export default function Onboarding({ onComplete }) {
           boxShadow: "0 8px 32px rgba(239,68,68,0.3)"
         }}>⚡</div>
 
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: "#f1f5f9", marginBottom: 12, fontFamily: "inherit" }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: "#d6e4f9", marginBottom: 12, fontFamily: "inherit" }}>
           Welcome to ThreatLens AI
         </h1>
 
-        <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.8, marginBottom: 40 }}>
+        <p style={{ fontSize: 14, color: "#9a907d", lineHeight: 1.8, marginBottom: 40 }}>
           ThreatLens monitors your system for active attacks and pulls live
           threat intelligence from the internet — all in one place.
           <br /><br />
           Before we start, we'll ask for a few permissions.{" "}
-          <strong style={{ color: "#94a3b8" }}>
+          <strong style={{ color: "#b6c6ed" }}>
             You're in full control of what we can access.
           </strong>
         </p>
@@ -138,10 +138,10 @@ export default function Onboarding({ onComplete }) {
   // ── SCREEN 1: Permissions ──────────────────────────────────
   if (step === 1) return (
     <Screen>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9", marginBottom: 8, fontFamily: "inherit" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#d6e4f9", marginBottom: 8, fontFamily: "inherit" }}>
         System Monitoring Permissions
       </h2>
-      <p style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: "#9a907d", marginBottom: 24 }}>
         Choose what ThreatLens can monitor. Change these anytime in Settings.
       </p>
 
@@ -165,15 +165,15 @@ export default function Onboarding({ onComplete }) {
       ].map(p => (
         <div key={p.key} style={{
           display: "flex", alignItems: "center", gap: 14,
-          padding: "14px 16px", background: "#0c1825",
+          padding: "14px 16px", background: "#132030",
           borderRadius: 10, marginBottom: 10, border: "1px solid #0f1e2e"
         }}>
           <span style={{ fontSize: 22, flexShrink: 0 }}>{p.icon}</span>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0", marginBottom: 3 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#d6e4f9", marginBottom: 3 }}>
               {p.title}
             </div>
-            <div style={{ fontSize: 12, color: "#475569" }}>{p.desc}</div>
+            <div style={{ fontSize: 12, color: "#9a907d" }}>{p.desc}</div>
           </div>
           <Toggle
             checked={config[p.key]}
@@ -192,20 +192,20 @@ export default function Onboarding({ onComplete }) {
   // ── SCREEN 2: Folders ──────────────────────────────────────
   if (step === 2) return (
     <Screen>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9", marginBottom: 8, fontFamily: "inherit" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#d6e4f9", marginBottom: 8, fontFamily: "inherit" }}>
         Which folders should we watch?
       </h2>
-      <p style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: "#9a907d", marginBottom: 24 }}>
         We only watch for suspicious activity patterns — we never read your file contents.
       </p>
 
       {["Documents", "Desktop", "Downloads", "Pictures"].map(folder => (
         <div key={folder} style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "14px 16px", background: "#0c1825",
+          padding: "14px 16px", background: "#132030",
           borderRadius: 10, marginBottom: 10, border: "1px solid #0f1e2e"
         }}>
-          <span style={{ fontSize: 14, color: "#e2e8f0" }}>📁 {folder}</span>
+          <span style={{ fontSize: 14, color: "#d6e4f9" }}>📁 {folder}</span>
           <Toggle
             checked={config.folders.includes(folder)}
             onChange={v => setConfig({
@@ -228,10 +228,10 @@ export default function Onboarding({ onComplete }) {
   // ── SCREEN 3: Response Mode ────────────────────────────────
   if (step === 3) return (
     <Screen>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9", marginBottom: 8, fontFamily: "inherit" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#d6e4f9", marginBottom: 8, fontFamily: "inherit" }}>
         How should ThreatLens respond?
       </h2>
-      <p style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: "#9a907d", marginBottom: 24 }}>
         Choose how aggressively the app acts when it detects a threat.
       </p>
 
@@ -249,19 +249,19 @@ export default function Onboarding({ onComplete }) {
           key={opt.val}
           onClick={() => setConfig({ ...config, responseMode: opt.val })}
           style={{
-            padding: "20px", background: "#0c1825", borderRadius: 12, marginBottom: 12,
-            border: `1px solid ${config.responseMode === opt.val ? "#2563eb" : "#0f1e2e"}`,
+            padding: "20px", background: "#132030", borderRadius: 12, marginBottom: 12,
+            border: `1px solid ${config.responseMode === opt.val ? "#ecc155" : "#1e2b3b"}`,
             cursor: "pointer", transition: "border-color 0.2s"
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
             <span style={{ fontSize: 20 }}>{opt.icon}</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0" }}>{opt.label}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#d6e4f9" }}>{opt.label}</span>
             {config.responseMode === opt.val && (
-              <span style={{ marginLeft: "auto", color: "#2563eb", fontSize: 18 }}>✓</span>
+              <span style={{ marginLeft: "auto", color: "#ecc155", fontSize: 18 }}>✓</span>
             )}
           </div>
-          <p style={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>{opt.desc}</p>
+          <p style={{ fontSize: 13, color: "#9a907d", lineHeight: 1.6 }}>{opt.desc}</p>
         </div>
       ))}
 
@@ -275,10 +275,10 @@ export default function Onboarding({ onComplete }) {
   // ── SCREEN 4: Notifications ────────────────────────────────
   if (step === 4) return (
     <Screen>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9", marginBottom: 8, fontFamily: "inherit" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#d6e4f9", marginBottom: 8, fontFamily: "inherit" }}>
         How do you want to be notified?
       </h2>
-      <p style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: "#9a907d", marginBottom: 24 }}>
         Critical incidents always notify you regardless of these settings.
       </p>
 
@@ -289,11 +289,11 @@ export default function Onboarding({ onComplete }) {
       ].map(n => (
         <div key={n.key} style={{
           display: "flex", alignItems: "center", gap: 14,
-          padding: "16px", background: "#0c1825",
+          padding: "16px", background: "#132030",
           borderRadius: 10, marginBottom: 10, border: "1px solid #0f1e2e"
         }}>
           <span style={{ fontSize: 20 }}>{n.icon}</span>
-          <span style={{ flex: 1, fontSize: 14, color: "#e2e8f0" }}>{n.label}</span>
+          <span style={{ flex: 1, fontSize: 14, color: "#d6e4f9" }}>{n.label}</span>
           <Toggle
             checked={config.notifications[n.key]}
             onChange={v => setConfig({
@@ -314,43 +314,43 @@ export default function Onboarding({ onComplete }) {
   // ── SCREEN 5: AI Setup ─────────────────────────────────────
   if (step === 5) return (
     <Screen>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9", marginBottom: 8, fontFamily: "inherit" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#d6e4f9", marginBottom: 8, fontFamily: "inherit" }}>
         AI Threat Analysis
       </h2>
-      <p style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: "#9a907d", marginBottom: 24 }}>
         ThreatLens uses GPT-4o to summarise threats and write your morning brief.
         Your API key stays on your machine only — never sent anywhere except OpenAI.
       </p>
 
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, color: "#475569", marginBottom: 8 }}>OpenAI API Key</div>
+        <div style={{ fontSize: 12, color: "#9a907d", marginBottom: 8 }}>OpenAI API Key</div>
         <input
           type="password"
           placeholder="sk-..."
           value={config.apiKey}
           onChange={e => setConfig({ ...config, apiKey: e.target.value })}
           style={{
-            width: "100%", background: "#0c1825",
+            width: "100%", background: "#132030",
             border: "1px solid #1e3352", borderRadius: 10,
-            padding: "12px 16px", color: "#e2e8f0",
+            padding: "12px 16px", color: "#d6e4f9",
             fontSize: 14, fontFamily: "inherit", outline: "none"
           }}
         />
-        <div style={{ fontSize: 11, color: "#334155", marginTop: 6 }}>
+        <div style={{ fontSize: 11, color: "#6b7a6b", marginTop: 6 }}>
           Don't have one? Leave blank to use Groq (free) instead.
         </div>
       </div>
 
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "16px", background: "#0c1825",
+        padding: "16px", background: "#132030",
         borderRadius: 10, border: "1px solid #0f1e2e", marginBottom: 24
       }}>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0", marginBottom: 3 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#d6e4f9", marginBottom: 3 }}>
             🤖 Enable AI Features
           </div>
-          <div style={{ fontSize: 12, color: "#475569" }}>
+          <div style={{ fontSize: 12, color: "#9a907d" }}>
             Summaries, verdicts, and morning brief
           </div>
         </div>
@@ -370,24 +370,24 @@ export default function Onboarding({ onComplete }) {
   // ── SCREEN 6: Startup ──────────────────────────────────────
   if (step === 6) return (
     <Screen>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9", marginBottom: 8, fontFamily: "inherit" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#d6e4f9", marginBottom: 8, fontFamily: "inherit" }}>
         Background Protection
       </h2>
-      <p style={{ fontSize: 13, color: "#475569", marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: "#9a907d", marginBottom: 24 }}>
         Keep ThreatLens running in the background so protection is always active.
       </p>
 
       <div style={{
         display: "flex", alignItems: "center", gap: 14,
-        padding: "20px", background: "#0c1825",
+        padding: "20px", background: "#132030",
         borderRadius: 12, marginBottom: 12, border: "1px solid #0f1e2e"
       }}>
         <span style={{ fontSize: 22 }}>🚀</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0", marginBottom: 3 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#d6e4f9", marginBottom: 3 }}>
             Start ThreatLens when my computer starts
           </div>
-          <div style={{ fontSize: 12, color: "#475569" }}>
+          <div style={{ fontSize: 12, color: "#9a907d" }}>
             Recommended — ensures you're always protected from boot
           </div>
         </div>
@@ -399,15 +399,15 @@ export default function Onboarding({ onComplete }) {
 
       <div style={{
         display: "flex", alignItems: "center", gap: 14,
-        padding: "20px", background: "#0c1825",
+        padding: "20px", background: "#132030",
         borderRadius: 12, marginBottom: 24, border: "1px solid #0f1e2e"
       }}>
         <span style={{ fontSize: 22 }}>📌</span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#e2e8f0", marginBottom: 3 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#d6e4f9", marginBottom: 3 }}>
             Run in system tray when window is closed
           </div>
-          <div style={{ fontSize: 12, color: "#475569" }}>
+          <div style={{ fontSize: 12, color: "#9a907d" }}>
             App keeps protecting even when you close the window
           </div>
         </div>
@@ -432,10 +432,10 @@ export default function Onboarding({ onComplete }) {
           borderRadius: 16, display: "flex", alignItems: "center",
           justifyContent: "center", fontSize: 28, margin: "0 auto 20px"
         }}>✓</div>
-        <h2 style={{ fontSize: 24, fontWeight: 800, color: "#f1f5f9", marginBottom: 8, fontFamily: "inherit" }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: "#d6e4f9", marginBottom: 8, fontFamily: "inherit" }}>
           You're all set
         </h2>
-        <p style={{ fontSize: 13, color: "#475569" }}>
+        <p style={{ fontSize: 13, color: "#9a907d" }}>
           Here's what ThreatLens will monitor. Change anything later in Settings.
         </p>
       </div>
@@ -454,8 +454,8 @@ export default function Onboarding({ onComplete }) {
           padding: "11px 0",
           borderBottom: i < 6 ? "1px solid #0f1e2e" : "none"
         }}>
-          <span style={{ fontSize: 13, color: "#64748b" }}>{item.label}</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: item.on ? "#22c55e" : "#475569" }}>
+          <span style={{ fontSize: 13, color: "#9a907d" }}>{item.label}</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: item.on ? "#2ed573" : "#9a907d" }}>
             {item.val}
           </span>
         </div>
