@@ -10,3 +10,5 @@ dist-installers/
 .env.example*.exe
 dist/
 build/
+*.exe
+dist/
